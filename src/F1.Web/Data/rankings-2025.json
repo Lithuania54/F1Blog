@@ -1,0 +1,14 @@
+{
+  "DriverStandings": [
+    { "Position": 1, "Name": "Max Verstappen", "Team": "Red Bull Racing", "Points": 420, "Wins": 12, "Podiums": 15 },
+    { "Position": 2, "Name": "Lewis Hamilton", "Team": "Mercedes", "Points": 298, "Wins": 3, "Podiums": 9 },
+    { "Position": 3, "Name": "Charles Leclerc", "Team": "Ferrari", "Points": 265, "Wins": 2, "Podiums": 7 },
+    { "Position": 4, "Name": "Lando Norris", "Team": "McLaren", "Points": 198, "Wins": 1, "Podiums": 5 },
+    { "Position": 5, "Name": "George Russell", "Team": "Mercedes", "Points": 172, "Wins": 0, "Podiums": 4 }
+  ],
+  "TeamStandings": [
+    { "Position": 1, "Name": "Red Bull Racing", "Team": "Red Bull Racing", "Points": 720, "Wins": 12, "Podiums": 28 },
+    { "Position": 2, "Name": "Mercedes", "Team": "Mercedes", "Points": 470, "Wins": 3, "Podiums": 14 },
+    { "Position": 3, "Name": "Ferrari", "Team": "Ferrari", "Points": 380, "Wins": 2, "Podiums": 11 }
+  ]
+}

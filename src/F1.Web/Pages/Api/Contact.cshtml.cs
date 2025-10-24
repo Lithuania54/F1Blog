@@ -10,7 +10,7 @@ public class ContactModel : PageModel
 
     public ContactModel(ContactService contact) => _contact = contact;
 
-    public async Task<IActionResult> OnPostAsync([FromForm] string name, [FromForm] string email, [FromForm] string message)
+    public IActionResult OnPost([FromForm] string name, [FromForm] string email, [FromForm] string message)
     {
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(message))
             return new JsonResult(new { ok = false, message = "missing" }) { StatusCode = 400 };

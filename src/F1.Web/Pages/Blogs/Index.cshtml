@@ -1,0 +1,33 @@
+@page
+@model F1.Web.Pages.Blogs.IndexModel
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="max-w-4xl mx-auto px-4 py-12">
+  <h1 class="text-3xl font-bold mb-4">Blogs</h1>
+  <div class="mb-4">
+    <form method="get">
+      <button name="shuffle" value="1" class="px-3 py-2 bg-[var(--accent)] text-black rounded">Shuffle</button>
+    </form>
+  </div>
+
+  <div class="grid gap-6">
+    @foreach(var p in Model.Posts)
+    {
+      <article class="bg-neutral-900 p-6 rounded">
+        <h2 class="text-xl font-semibold">@p.Title</h2>
+        <div class="text-sm text-gray-400 mb-2">@p.Date.ToString("yyyy-MM-dd")</div>
+        <p class="text-gray-300">@p.Excerpt</p>
+        <a class="text-[var(--accent)] mt-2 inline-block" href="/posts/@p.Source">Read more →</a>
+      </article>
+    }
+  </div>
+
+  <div class="mt-6">
+    @if(Model.HasMore)
+    {
+      <a asp-page="/Blogs/Index" asp-route-pageNumber="@Model.PageNumber + 1" class="px-3 py-2 bg-neutral-800 rounded">Next</a>
+    }
+  </div>
+</div>

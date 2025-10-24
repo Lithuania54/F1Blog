@@ -1,15 +1,40 @@
-<nav class="w-full bg-gradient-to-b from-black/60 to-black/40 fixed top-0 z-40">
+@using Microsoft.AspNetCore.Mvc.Routing
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+<nav class="w-full bg-black/60 fixed top-0 z-40">
   <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-    <a class="text-white font-bold text-lg tracking-wide" href="#">DriveTheStory</a>
-    <div class="hidden md:flex gap-4 items-center">
-      <a class="hover:text-white" href="#services">Services</a>
-      <a class="hover:text-white" href="#works">Works</a>
-      <a class="hover:text-white" href="#drivers">Drivers</a>
-      <a class="hover:text-white" href="#calendar">Calendar</a>
-      <a class="hover:text-white" href="#insights">Insights</a>
+    <div class="flex items-center gap-3">
+      <a class="text-white font-bold text-lg tracking-wide" asp-page="/Index">DriveTheStory</a>
+      <button id="darkToggle" aria-label="Toggle dark mode" class="text-gray-300 hidden md:inline">🌙</button>
     </div>
+
+    <div class="hidden md:flex gap-6 items-center" role="navigation" aria-label="Main Navigation">
+      <a class="nav-link text-gray-300 hover:text-white" asp-page="/Blogs">Blogs</a>
+      <a class="nav-link text-gray-300 hover:text-white" asp-page="/Rankings">Rankings</a>
+      <a class="nav-link text-gray-300 hover:text-white" asp-page="/Races">Races</a>
+    </div>
+
     <div class="md:hidden">
-      <button aria-label="menu" class="text-white">☰</button>
+      <button id="mobileMenuButton" aria-controls="mobileMenu" aria-expanded="false" aria-label="Open menu" class="text-white">☰</button>
     </div>
   </div>
+
+  <div id="mobileMenu" class="hidden bg-black/80 md:hidden">
+    <div class="px-4 py-4 flex flex-col gap-3">
+      <a class="nav-link text-gray-300 hover:text-white" asp-page="/Blogs">Blogs</a>
+      <a class="nav-link text-gray-300 hover:text-white" asp-page="/Rankings">Rankings</a>
+      <a class="nav-link text-gray-300 hover:text-white" asp-page="/Races">Races</a>
+    </div>
+  </div>
+
+  <script>
+    // Basic active-link highlighting (server-side fallback uses asp-page)
+    (function(){
+      const path = location.pathname.toLowerCase();
+      document.querySelectorAll('.nav-link').forEach(a=>{
+        try{ if(a.getAttribute('href') && path===a.getAttribute('href').toLowerCase()) a.classList.add('text-white','font-semibold'); }catch(e){}
+      });
+    })();
+  </script>
 </nav>
+

@@ -6,7 +6,30 @@
 
 <meta name="next-race" content="@Model.NextRace?.Date.ToString("o")" />
 
-<partial name="_Hero" />
+<!-- Hero + Carousel -->
+<section class="pt-20">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div>
+        <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight">Drive the Story — Formula One Insights</h1>
+        <p class="mt-4 text-gray-300 max-w-lg">Race reports, team analytics and driver profiles — distilled for fans and teams.</p>
+      </div>
+      <div>
+  <!-- Carousel container -->
+  <div id="f1Carousel" class="relative rounded overflow-hidden" data-interval="4000" data-images='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Images))'>
+          <noscript>
+            <!-- fallback static hero image when JS disabled -->
+            <img src="/images/1.png" alt="F1 hero" class="w-full h-60 object-cover rounded" />
+          </noscript>
+          <div class="carousel-slides h-60 bg-neutral-900"></div>
+          <button class="carousel-prev absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 p-2 rounded text-white" aria-label="Previous slide">‹</button>
+          <button class="carousel-next absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 p-2 rounded text-white" aria-label="Next slide">›</button>
+          <div class="carousel-dots absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section id="services" class="py-12">
   <div class="max-w-6xl mx-auto px-4">

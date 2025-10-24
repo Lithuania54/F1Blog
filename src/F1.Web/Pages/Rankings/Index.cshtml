@@ -1,0 +1,73 @@
+@page
+@model F1.Web.Pages.Rankings.IndexModel
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="max-w-6xl mx-auto px-4 py-12">
+  <h1 class="text-3xl font-bold mb-6">2025 Rankings</h1>
+
+  <section class="mb-8">
+    <h2 class="text-2xl font-semibold mb-3">Driver Standings</h2>
+    <table class="w-full text-left table-auto">
+      <thead>
+        <tr class="text-sm text-gray-400">
+          <th>Pos</th><th>Name</th><th>Team</th><th class="sortable">Points</th><th>Wins</th><th>Podiums</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach(var d in Model.DriverStandings)
+        {
+          <tr class="@(d.Position==1?"bg-neutral-800":"") + " border-t border-neutral-800"">
+            <td class="py-2">@d.Position</td>
+            <td>@d.Name</td>
+            <td>@d.Team</td>
+            <td>@d.Points</td>
+            <td>@d.Wins</td>
+            <td>@d.Podiums</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2 class="text-2xl font-semibold mb-3">Team Standings</h2>
+    <table class="w-full text-left table-auto">
+      <thead>
+        <tr class="text-sm text-gray-400">
+          <th>Pos</th><th>Team</th><th class="sortable">Points</th><th>Wins</th><th>Podiums</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach(var t in Model.TeamStandings)
+        {
+          <tr class="border-t border-neutral-800">
+            <td class="py-2">@t.Position</td>
+            <td>@t.Name</td>
+            <td>@t.Points</td>
+            <td>@t.Wins</td>
+            <td>@t.Podiums</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</div>
+
+@section Scripts {
+  <script>
+    // tiny client-side sort for columns with class 'sortable'
+    document.addEventListener('click', function(e){
+      const el = e.target;
+      if(el.classList && el.classList.contains('sortable')){
+        const th = el; const table = th.closest('table');
+        const colIndex = Array.from(th.parentElement.children).indexOf(th);
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((a,b)=> +b.children[colIndex].innerText - +a.children[colIndex].innerText);
+        rows.forEach(r=>tbody.appendChild(r));
+      }
+    });
+  </script>
+}

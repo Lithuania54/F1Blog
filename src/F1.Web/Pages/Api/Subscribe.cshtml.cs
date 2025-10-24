@@ -10,7 +10,7 @@ public class SubscribeModel : PageModel
 
     public SubscribeModel(NewsletterService news) => _news = news;
 
-    public async Task<IActionResult> OnPostAsync([FromForm] string email)
+    public IActionResult OnPost([FromForm] string email)
     {
         if (string.IsNullOrWhiteSpace(email)) return new JsonResult(new { ok = false, message = "Email required" }) { StatusCode = 400 };
         // Basic server-side validation

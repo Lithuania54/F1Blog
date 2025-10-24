@@ -1,0 +1,9 @@
+{
+  "Races": [
+    { "Id": "bahrain", "Name": "Bahrain Grand Prix", "Location": "Sakhir, Bahrain", "Date": "2025-03-30T15:00:00Z", "MapUrl": "https://www.google.com/maps/place/Bahrain+International+Circuit" },
+    { "Id": "monaco", "Name": "Monaco Grand Prix", "Location": "Monte Carlo, Monaco", "Date": "2025-05-25T13:00:00Z", "MapUrl": "https://www.google.com/maps/place/Circuit+de+Monaco" },
+    { "Id": "britain", "Name": "British Grand Prix", "Location": "Silverstone, UK", "Date": "2025-07-06T13:00:00Z", "MapUrl": "https://www.google.com/maps/place/Silverstone+Circuit" },
+    { "Id": "belgium", "Name": "Belgian Grand Prix", "Location": "Spa-Francorchamps, Belgium", "Date": "2025-08-24T13:00:00Z", "MapUrl": "https://www.google.com/maps/place/Circuit+de+Spa-Francorchamps" },
+    { "Id": "italy", "Name": "Italian Grand Prix", "Location": "Monza, Italy", "Date": "2025-09-07T13:00:00Z", "MapUrl": "https://www.google.com/maps/place/Autodromo+Nazionaledi+Monza" }
+  ]
+}
