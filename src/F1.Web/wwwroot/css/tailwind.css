@@ -1,0 +1,90 @@
+/* Minimal compiled Tailwind-like utilities used by the site.
+   This is a small, focused subset to reproduce layout and color utilities
+   used by the F1 site without requiring the runtime Tailwind CDN.  It is
+   not a full Tailwind build but covers the classes in our markup.
+*/
+:root{
+  --accent:#E10600;
+  --bg:#0b0b0d;
+  --neutral-900:#111111;
+}
+html,body{height:100%;}
+body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:var(--bg); color:#e6e6e6;-webkit-font-smoothing:antialiased;}
+.antialiased{-webkit-font-smoothing:antialiased}
+.max-w-6xl{max-width:72rem}
+.max-w-3xl{max-width:48rem}
+.mx-auto{margin-left:auto;margin-right:auto}
+.px-4{padding-left:1rem;padding-right:1rem}
+.pt-20{padding-top:5rem}
+.py-12{padding-top:3rem;padding-bottom:3rem}
+.mt-3{margin-top:.75rem}
+.mt-4{margin-top:1rem}
+.mt-6{margin-top:1.5rem}
+.mb-6{margin-bottom:1.5rem}
+.gap-6{gap:1.5rem}
+.gap-8{gap:2rem}
+.grid{display:grid}
+.grid-cols-1{grid-template-columns:repeat(1, minmax(0,1fr))}
+.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0,1fr))}
+.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0,1fr))}
+.items-center{align-items:center}
+.rounded{border-radius:.5rem}
+.overflow-hidden{overflow:hidden}
+.relative{position:relative}
+.absolute{position:absolute}
+.left-2{left:.5rem}
+.right-2{right:.5rem}
+.top-1\/2{top:50%}
+.-translate-y-1\/2{transform:translateY(-50%)}
+.bg-black\/50{background-color:rgba(0,0,0,.5)}
+.bg-black\/20{background-color:rgba(0,0,0,.2)}
+.bg-neutral-900{background-color:var(--neutral-900)}
+.text-white{color:#fff}
+.text-gray-300{color:#d1d5db}
+.text-gray-200{color:#e5e7eb}
+.text-4xl{font-size:2.25rem;line-height:2.5rem}
+.md\:text-6xl{font-size:3.75rem;line-height:1}
+.font-extrabold{font-weight:800}
+.font-semibold{font-weight:600}
+.font-bold{font-weight:700}
+.prose{line-height:1.6}
+.p-6{padding:1.5rem}
+.p-3{padding:.75rem}
+.w-full{width:100%}
+.h-60{height:15rem}
+.object-cover{object-fit:cover}
+.rounded-full{border-radius:9999px}
+.flex{display:flex}
+.justify-between{justify-content:space-between}
+.items-center{align-items:center}
+.hidden{display:none}
+.flex-col{flex-direction:column}
+.grid-cols-1{grid-template-columns:repeat(1, minmax(0,1fr))}
+.md\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.md\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+/* responsive breakpoints */
+@media (min-width:768px){
+  .md\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .md\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .md\:text-6xl{font-size:3.75rem}
+}
+
+/* small helpers */
+.carousel-slides{position:relative}
+.carousel-slide{position:relative}
+.carousel-dots button{border:0}
+.selection\:bg-red-600::selection{background:#b91c1c;color:#fff}
+
+/* footer / small components */
+.max-w-6xl{width:100%;box-sizing:border-box}
+
+/* accessibility focus */
+.focus-visible:focus{outline:2px solid rgba(255,255,255,0.12);outline-offset:2px}
+
+/* simple utilities used by _DriversGrid */
+.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.md\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+/* accent button */
+.bg-\[var\(--accent\)\]{background:var(--accent)}
