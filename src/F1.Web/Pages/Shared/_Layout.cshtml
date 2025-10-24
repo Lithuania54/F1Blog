@@ -1,0 +1,39 @@
+@namespace F1.Web.Pages.Shared
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Drive the Story — Formula One insights, race reports & team analytics." />
+  <link rel="canonical" href="@Context.Request.Scheme://@Context.Request.Host@Context.Request.Path" />
+  <meta property="og:title" content="Drive the Story — Formula One" />
+  <meta property="og:description" content="Race reports, driver profiles and team analytics." />
+  <title>Drive the Story — Formula One</title>
+  <!-- Tailwind CDN (quick) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--accent:#E10600}
+    .focus-visible{outline:2px solid rgba(255,255,255,0.12);outline-offset:2px}
+  </style>
+  <link rel="stylesheet" href="/css/site.css" />
+  @RenderSection("Head", required: false)
+</head>
+<body class="bg-[#0b0b0d] text-gray-200 selection:bg-red-600 selection:text-white">
+  <partial name="_Nav" />
+  <div class="min-h-screen">
+    @RenderBody()
+  </div>
+  <partial name="_Footer" />
+
+  <script>
+    // Dark preference default
+    (function(){
+      const key='f1:dark';
+      const saved=localStorage.getItem(key);
+      if(saved===null) localStorage.setItem(key,'true');
+      if(localStorage.getItem(key)==='true') document.documentElement.classList.add('dark');
+    })();
+  </script>
+  @RenderSection("Scripts", required: false)
+</body>
+</html>

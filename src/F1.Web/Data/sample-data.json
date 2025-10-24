@@ -1,0 +1,17 @@
+{
+  "Drivers": [
+    { "Id": "max_v", "Name": "Max Verstappen", "Team": "Red Bull Racing", "PhotoUrl": "https://images.unsplash.com/photo-1602524810222-3a3cc6a5b2d0?q=80&w=800&auto=format&fit=crop", "Bio": "Aggressive, precise racecraft. Multiple-time world champion.", "Wins": 50, "Podiums": 90 },
+    { "Id": "ham_s", "Name": "Lewis Hamilton", "Team": "Mercedes", "PhotoUrl": "https://images.unsplash.com/photo-1548172457-1c7b1f1037a9?q=80&w=800&auto=format&fit=crop", "Bio": "Smooth, strategic driver with an eye for late-braking moves.", "Wins": 103, "Podiums": 182 },
+    { "Id": "charles_l", "Name": "Charles Leclerc", "Team": "Ferrari", "PhotoUrl": "https://images.unsplash.com/photo-1542272605-1a7b2a5b9e20?q=80&w=800&auto=format&fit=crop", "Bio": "Young talent, quick over a single lap and brave in traffic.", "Wins": 6, "Podiums": 28 }
+  ],
+  "Races": [
+    { "Id": "bahrain", "Name": "Bahrain Grand Prix", "Location": "Sakhir, Bahrain", "Date": "2025-03-30T15:00:00Z", "MapUrl": "https://www.google.com/maps" },
+    { "Id": "monaco", "Name": "Monaco Grand Prix", "Location": "Monte Carlo, Monaco", "Date": "2025-05-25T13:00:00Z", "MapUrl": "https://www.google.com/maps" },
+    { "Id": "britain", "Name": "British Grand Prix", "Location": "Silverstone, UK", "Date": "2025-07-06T13:00:00Z", "MapUrl": "https://www.google.com/maps" }
+  ],
+  "Works": [
+    { "Id": "rpt2024", "Title": "Monaco Overtakes Analysis", "Excerpt": "A deep dive into the clean overtakes and springboard strategies.", "ImageUrl": "https://images.unsplash.com/photo-1525909002-01b6f9c1c2c8?q=80&w=1200&auto=format&fit=crop", "Link": "#" },
+    { "Id": "telemetry", "Title": "Telemetry: Unlocking Sector Gains", "Excerpt": "How teams find milliseconds in the data.", "ImageUrl": "https://images.unsplash.com/photo-1602810316326-c73f1d6f6d6d?q=80&w=1200&auto=format&fit=crop", "Link": "#" },
+    { "Id": "pitstop", "Title": "Pit Stop Optimization", "Excerpt": "A case study on shaving tenths through choreography.", "ImageUrl": "https://images.unsplash.com/photo-1502877338535-766e1452684a?q=80&w=1200&auto=format&fit=crop", "Link": "#" }
+  ]
+}

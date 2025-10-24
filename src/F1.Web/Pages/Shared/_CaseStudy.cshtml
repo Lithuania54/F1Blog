@@ -1,0 +1,9 @@
+@model F1.Web.Models.CaseStudy
+<div class="bg-neutral-900 rounded overflow-hidden hover:scale-[1.01] transition">
+  <img loading="lazy" src="@Model.ImageUrl" alt="@Model.Title" class="w-full h-40 object-cover" />
+  <div class="p-4">
+    <h4 class="font-semibold">@Model.Title</h4>
+    <p class="text-sm text-gray-300">@Model.Excerpt</p>
+    <a href="@Model.Link" class="mt-3 inline-block text-[var(--accent)]">Read case study →</a>
+  </div>
+</div>

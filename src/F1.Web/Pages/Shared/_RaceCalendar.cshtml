@@ -1,0 +1,17 @@
+@model IEnumerable<F1.Web.Models.RaceItem>
+<section id="calendar" class="py-16 bg-black/30">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-2xl font-bold mb-6">Race Calendar</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      @foreach(var r in Model)
+      {
+        <div class="p-4 bg-neutral-900 rounded">
+          <div class="text-sm text-gray-400">@r.Date.ToString("yyyy-MM-dd")</div>
+          <h3 class="font-semibold">@r.Name</h3>
+          <p class="text-sm text-gray-300">@r.Location</p>
+          <a class="text-[var(--accent)] text-sm mt-2 inline-block" href="@r.MapUrl">View map</a>
+        </div>
+      }
+    </div>
+  </div>
+</section>

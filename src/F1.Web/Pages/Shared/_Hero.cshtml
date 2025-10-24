@@ -1,0 +1,41 @@
+@model dynamic
+<section id="hero" class="relative pt-20 pb-20">
+  <div class="absolute inset-0 bg-black/60" aria-hidden="true"></div>
+  <div class="relative max-w-6xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center min-h-[60vh]">
+      <div>
+        <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight">Drive the Story — Formula One Insights</h1>
+        <p class="mt-4 text-gray-300 max-w-lg">Race reports, team analytics and driver profiles — distilled for fans and teams.</p>
+        <div class="mt-6 flex gap-3">
+          <a href="#insights" class="bg-[var(--accent)] hover:brightness-110 px-5 py-3 rounded text-black font-semibold">Explore Season</a>
+          <a href="#calendar" class="border border-gray-600 px-5 py-3 rounded">Race Calendar</a>
+        </div>
+        <div class="mt-8 text-sm text-gray-300">
+          Next race starts in <span id="countdown" class="font-mono ml-2">--:--:--</span>
+        </div>
+      </div>
+      <div class="overflow-hidden rounded-lg shadow-lg">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1200&auto=format&fit=crop" alt="F1 car in motion" class="w-full h-72 object-cover" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // small countdown (next race date passed in via data-next attribute?)
+    (function(){
+      // sample next race for local demo; in real app provide from server
+      const next = new Date(document.querySelector('meta[name="next-race"]')?.getAttribute('content') || '2025-03-30T15:00:00Z');
+      const el = document.getElementById('countdown');
+      function tick(){
+        const diff = next - new Date();
+        if(diff<=0){ el.textContent = 'Live'; return; }
+        const d = Math.floor(diff/86400000);
+        const h = Math.floor((diff%86400000)/3600000);
+        const m = Math.floor((diff%3600000)/60000);
+        const s = Math.floor((diff%60000)/1000);
+        el.textContent = `${d}d ${h}h ${m}m ${s}s`;
+      }
+      tick(); setInterval(tick,1000);
+    })();
+  </script>
+</section>
