@@ -30,6 +30,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor(); // ✅ Needed for _Nav.cshtml
 
 // Application Services
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<MarkdownService>();
 builder.Services.AddSingleton<NewsletterService>();
 builder.Services.AddSingleton<ContactService>();

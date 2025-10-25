@@ -2,82 +2,52 @@
 @model F1.Web.Pages.IndexModel
 @{
     Layout = "~/Pages/Shared/_Layout.cshtml";
-    var images = Model.CarouselImageUrls ?? new List<string>();
+    ViewData["Title"] = "Home";
 }
 
-<!-- Navbar is rendered by the layout (Pages/Shared/_Layout.cshtml) which includes the shared _Nav partial. -->
-<!-- Order: Navbar (from layout) -> Centered heading -> Full-viewport carousel -->
+<main class="home-container text-center">
 
-<section class="hero-tagline text-center py-4">
-  <div class="container">
-    <h1 class="display-5 mb-0">Everything about F1</h1>
-  </div>
-</section>
+    <section class="hero-title-section mt-4 mb-4">
+        <h1 class="display-5 fw-bold text-light">Everything about F1</h1>
+    </section>
 
-@if (images.Any())
-{
-  <section class="carousel-area" role="region" aria-label="F1 cars carousel">
-    <div class="swiper mySwiper" aria-live="polite">
-      <div class="swiper-wrapper">
-        @for (int i = 0; i < images.Count; i++)
-        {
-            <div class="swiper-slide">
-              <img src="@images[i]" alt="F1 car #@(i + 1)" loading="lazy" class="carousel-img" />
+    @if (Model.CarouselImageUrls.Any())
+    {
+        <div class="swiper hero-swiper">
+            <div class="swiper-wrapper">
+                @for (int i = 0; i < Model.CarouselImageUrls.Count; i++)
+                {
+                    var url = Model.CarouselImageUrls[i];
+                    <div class="swiper-slide">
+                        <img src="@url" alt="F1 car #@(i + 1)" class="carousel-img" />
+                    </div>
+                }
             </div>
-        }
-      </div>
-
-      <div class="swiper-pagination" role="navigation" aria-label="Carousel pagination"></div>
-      <button class="swiper-button-prev" aria-label="Previous slide" type="button"></button>
-      <button class="swiper-button-next" aria-label="Next slide" type="button"></button>
-    </div>
-
-    <noscript>
-      <div class="noscript-hero text-center">
-        <img src="@images.First()" alt="F1 hero image" loading="lazy" class="carousel-img" />
-      </div>
-    </noscript>
-  </section>
-}
-else
-{
-  <section class="no-images-placeholder text-center py-5">
-    <div class="container">
-      <p class="lead text-muted mb-0">
-        @Model.CarouselNotFoundMessage
-      </p>
-    </div>
-  </section>
-}
-
-@section Styles {
-  <style>
-    /* proportional layout: tagline height + carousel fill remaining viewport */
-    .hero-tagline { background: rgba(0,0,0,0.55); color: #fff; }
-    .carousel-area { height: calc(100vh - 110px); display:flex; align-items:center; justify-content:center; background:#000; }
-    .swiper, .swiper-slide { width:100%; height:100%; }
-    .carousel-img { width:100%; height:100%; object-fit:cover; display:block; }
-    .noscript-hero img { width:100%; height:80vh; object-fit:cover; }
-    @@media (max-width:576px) {
-      .carousel-area { height: calc(100vh - 140px); }
-      .hero-tagline .display-5 { font-size:1.5rem; }
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+        </div>
     }
-  </style>
-}
+    else
+    {
+        <p class="text-secondary mt-4">@Model.CarouselNotFoundMessage</p>
+    }
+
+</main>
 
 @section Scripts {
-  @* Swiper init is expected in /js/carousel-init.js (loaded by layout). If you need an inline fallback during debugging, uncomment below:
-  <script>
-    // document.addEventListener('DOMContentLoaded', function () {
-    //   if (typeof Swiper === 'undefined') return;
-    //   new Swiper('.mySwiper', {
-    //     loop: true,
-    //     autoplay: { delay: 4000, disableOnInteraction: false, pauseOnMouseEnter: true },
-    //     pagination: { el: '.swiper-pagination', clickable: true },
-    //     navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-    //     keyboard: { enabled: true }
-    //   });
-    // });
-  </script>
-  *@
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    new Swiper('.hero-swiper', {
+        loop: true,
+        pagination: { el: '.swiper-pagination', clickable: true },
+        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+        autoplay: { delay: 4000, disableOnInteraction: false },
+        slidesPerView: 1,
+        spaceBetween: 0,
+        centeredSlides: true,
+        effect: 'slide'
+    });
+});
+</script>
 }
