@@ -10,20 +10,10 @@ public class IndexModel : PageModel
     public List<Standing> DriverStandings { get; set; } = new();
     public List<Standing> TeamStandings { get; set; } = new();
 
+    // Rankings are intentionally disabled for now per requirements. This page
+    // shows a prominent placeholder. When enabled, load data from a JSON file
+    // matching the schema in the TODO in the view.
     public void OnGet()
     {
-        var dataFile = Path.Combine(Directory.GetCurrentDirectory(), "src", "F1.Web", "Data", "rankings-2025.json");
-        if (System.IO.File.Exists(dataFile))
-        {
-            var doc = JsonSerializer.Deserialize<JsonElement>(System.IO.File.ReadAllText(dataFile));
-            if (doc.TryGetProperty("DriverStandings", out var d))
-            {
-                DriverStandings = JsonSerializer.Deserialize<List<Standing>>(d.GetRawText())!;
-            }
-            if (doc.TryGetProperty("TeamStandings", out var t))
-            {
-                TeamStandings = JsonSerializer.Deserialize<List<Standing>>(t.GetRawText())!;
-            }
-        }
     }
 }

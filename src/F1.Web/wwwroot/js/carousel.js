@@ -14,7 +14,7 @@
     this.init();
   }
   Carousel.prototype.init = function(){
-    if(!this.images.length) return;
+    if(!this.images.length) return; // nothing to render when no PNG images found
     this.slidesEl.innerHTML = '';
     this.dotsEl.innerHTML = '';
     this.images.forEach((src,i)=>{
@@ -57,7 +57,7 @@
         const imgs = [];
         // server should inject a global; if not, attempt to read from data-images attr
         const data = c.dataset.images;
-        if(data){ try{ JSON.parse(data).forEach(u=>imgs.push(u)); }catch(e){} }
+        if(data){ try{ const parsed = JSON.parse(data); if(Array.isArray(parsed)) parsed.forEach(u=>imgs.push(u)); }catch(e){ console.warn('carousel: failed to parse data-images', e); } }
         window.F1CarouselImages = imgs;
       }
       new Carousel(c);
