@@ -1,5 +1,12 @@
 {
   "Races": [
+    { "Date": "2025-03-30", "Name": "Australian Grand Prix", "Location": "Melbourne, Australia", "MapUrl": "https://maps.example.com/aus" },
+    { "Date": "2025-05-25", "Name": "Monaco Grand Prix", "Location": "Monte Carlo, Monaco", "MapUrl": "https://maps.example.com/mco" },
+    { "Date": "2025-07-20", "Name": "British Grand Prix", "Location": "Silverstone, UK", "MapUrl": "https://maps.example.com/gb" }
+  ]
+}
+{
+  "Races": [
     { "Id": "bahrain", "Name": "Bahrain Grand Prix", "Location": "Sakhir, Bahrain", "Date": "2025-03-30T15:00:00Z", "MapUrl": "https://www.google.com/maps/place/Bahrain+International+Circuit" },
     { "Id": "monaco", "Name": "Monaco Grand Prix", "Location": "Monte Carlo, Monaco", "Date": "2025-05-25T13:00:00Z", "MapUrl": "https://www.google.com/maps/place/Circuit+de+Monaco" },
     { "Id": "britain", "Name": "British Grand Prix", "Location": "Silverstone, UK", "Date": "2025-07-06T13:00:00Z", "MapUrl": "https://www.google.com/maps/place/Silverstone+Circuit" },

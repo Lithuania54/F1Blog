@@ -1,0 +1,15 @@
+@page
+@model F1.Web.Pages.Blogs.DetailsModel
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5 mt-5">
+  <div class="card bg-dark text-white">
+    <div class="card-body">
+      <h1 class="h4">@Model.Post?.Title</h1>
+      <div class="small text-muted mb-3">@Model.Post?.Date.ToString("yyyy-MM-dd")</div>
+      <div class="prose">@Html.Raw(Model.Post?.Html)</div>
+    </div>
+  </div>
+</div>

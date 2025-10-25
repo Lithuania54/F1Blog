@@ -57,7 +57,9 @@ public class MarkdownService
             Date = DateTime.TryParse(meta.GetValueOrDefault("date"), out var d) ? d : File.GetLastWriteTime(filePath),
             Excerpt = meta.GetValueOrDefault("excerpt"),
             Html = html,
-            Source = Path.GetFileName(filePath)
+            Source = Path.GetFileName(filePath),
+            Slug = Path.GetFileNameWithoutExtension(filePath),
+            ImageUrl = meta.GetValueOrDefault("image")
         };
     }
 }
@@ -69,4 +71,6 @@ public record RenderedPost
     public string? Excerpt { get; init; }
     public string Html { get; init; } = string.Empty;
     public string Source { get; init; } = string.Empty;
+    public string Slug { get; init; } = string.Empty; // filename without extension
+    public string? ImageUrl { get; set; }
 }

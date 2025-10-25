@@ -60,10 +60,10 @@ public class IndexModel : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
             var webRoot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
             var wwwImgDir = Path.Combine(webRoot, "images");
             var repoImgDir = Path.Combine(_env.ContentRootPath, "images");
-            // Only allow PNG images named 1.png .. 10.png per requirement.
+            // Only allow AVIF images named 1.avif .. 10.avif per requirement.
             for (int i = 1; i <= 10; i++)
             {
-                var fileName = i + ".png";
+                var fileName = i + ".avif";
                 var p1 = Path.Combine(wwwImgDir, fileName);
                 var p2 = Path.Combine(repoImgDir, fileName);
                 if (System.IO.File.Exists(p1))
@@ -72,9 +72,6 @@ public class IndexModel : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
                 }
                 else if (System.IO.File.Exists(p2))
                 {
-                    // files under ContentRootPath/images are served at /images because
-                    // Program.cs adds a StaticFileOptions mapping for that path. This
-                    // lets us avoid copying files during development.
                     CarouselImageUrls.Add($"/images/{fileName}");
                 }
             }
@@ -84,15 +81,6 @@ public class IndexModel : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
             // ignore and allow fallback
         }
 
-        // Fallback: if no local images, provide unsplash placeholders
-        if (!CarouselImageUrls.Any())
-        {
-            CarouselImageUrls = new List<string>
-            {
-                "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1200&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1549921296-3a7d9f4a4d4c?q=80&w=1200&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?q=80&w=1200&auto=format&fit=crop"
-            };
-        }
+        // If none found, leave CarouselImageUrls empty — view will show a neutral hero.
     }
 }

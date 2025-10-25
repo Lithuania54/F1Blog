@@ -1,44 +1,30 @@
 @using Microsoft.AspNetCore.Mvc.Routing
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-@*
-  _Nav.cshtml: responsive navigation bar with server-side active link highlighting.
-  Customize links here. Accessibility: uses aria-current on the active link.
-*@
 
 @{
-    // Determine current path to mark the active link for accessibility
     var current = HttpContextAccessor?.HttpContext?.Request?.Path.Value?.ToLowerInvariant() ?? "/";
     Func<string,bool> active = p => current.StartsWith(p.ToLowerInvariant());
 }
 
-<!--
-  Updated _Nav:
-  - Responsive, accessible nav with server-side active link highlighting.
-  - ASSUMPTION: small JS remains for mobile toggle (in nav.js).
--->
-<nav class="w-full bg-black/60 fixed top-0 z-40" role="navigation" aria-label="Main">
-  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <a class="text-white font-bold text-lg tracking-wide" asp-page="/Index">DriveTheStory</a>
-      <button id="darkToggle" aria-label="Toggle dark mode" class="text-gray-300 hidden md:inline">🌙</button>
-    </div>
-
-    <div class="hidden md:flex gap-6 items-center">
-      <a class="nav-link text-gray-300 hover:text-white @(active("/blogs")?"text-white font-semibold":"")" asp-page="/Blogs" aria-current="@(active("/blogs")?"page":null)">Blogs</a>
-      <a class="nav-link text-gray-300 hover:text-white @(active("/rankings")?"text-white font-semibold":"")" asp-page="/Rankings" aria-current="@(active("/rankings")?"page":null)">Rankings</a>
-      <a class="nav-link text-gray-300 hover:text-white @(active("/races")?"text-white font-semibold":"")" asp-page="/Races" aria-current="@(active("/races")?"page":null)">Races</a>
-    </div>
-
-    <div class="md:hidden">
-      <button id="mobileMenuButton" aria-controls="mobileMenu" aria-expanded="false" aria-label="Open menu" class="text-white">☰</button>
-    </div>
-  </div>
-
-  <div id="mobileMenu" class="hidden bg-black/80 md:hidden">
-    <div class="px-4 py-4 flex flex-col gap-3">
-      <a class="nav-link text-gray-300 hover:text-white @(active("/blogs")?"text-white font-semibold":"")" asp-page="/Blogs">Blogs</a>
-      <a class="nav-link text-gray-300 hover:text-white @(active("/rankings")?"text-white font-semibold":"")" asp-page="/Rankings">Rankings</a>
-      <a class="nav-link text-gray-300 hover:text-white @(active("/races")?"text-white font-semibold":"")" asp-page="/Races">Races</a>
+@* Bootstrap 5 navbar: Brand on left, links on right. Uses collapse for mobile. *@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" aria-label="Main navigation">
+  <div class="container-fluid">
+    <a class="navbar-brand" asp-page="/Index">Drive the Story</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link @(active("/standings")?"active":"")" aria-current="@(active("/standings")?"page":null)" asp-page="/Standings/Index">Standings</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link @(active("/races")?"active":"")" aria-current="@(active("/races")?"page":null)" asp-page="/Races/Index">Races</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link @(active("/blogs")?"active":"")" aria-current="@(active("/blogs")?"page":null)" asp-page="/Blogs/Index">Blogs</a>
+        </li>
+      </ul>
     </div>
   </div>
 </nav>

@@ -22,8 +22,11 @@ public class IndexModel : PageModel
             var rnd = new Random();
             all = all.OrderBy(x => rnd.Next()).ToList();
         }
-
-        Posts = all.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
+        Posts = all.Skip((PageNumber - 1) * PageSize).Take(PageSize).Select(p=>{
+            // Ensure there is a thumbnail URL; ASSUMPTION: posts may include ImageUrl in frontmatter
+            if(string.IsNullOrEmpty(p.ImageUrl)) p.ImageUrl = "/images/1.avif";
+            return p;
+        }).ToList();
         HasMore = all.Count > PageNumber * PageSize;
     }
 }

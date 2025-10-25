@@ -6,17 +6,33 @@
   Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<div class="max-w-4xl mx-auto px-4 py-20">
-  <div class="bg-yellow-900/10 border-l-4 border-yellow-500 p-6 rounded text-center">
-    <h1 class="text-2xl font-bold">Races are not seen</h1>
-    <p class="mt-2 text-gray-300">Races are not visible yet — data unavailable / coming soon.</p>
-  </div>
-
-  <div class="mt-8 text-sm text-gray-400">
-    <!-- TODO: When races are available, expect a JSON structure like:
-         {
-           "Races": [{ "Date":"2025-05-01", "Name":"Grand Prix", "Location":"Country", "MapUrl":"https://..." }]
-         }
-    -->
-  </div>
+<div class="container py-5 mt-5">
+  <h1 class="h4 mb-3">Races</h1>
+  @if(Model.TrackImageUrls.Any() && Model.Races.Any())
+  {
+    <div id="tracksSwiper" class="swiper tracks-swiper" data-tracks='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrackImageUrls))'>
+      <div class="swiper-wrapper">
+        @for(int i=0;i<Model.TrackImageUrls.Count;i++)
+        {
+          var img = Model.TrackImageUrls[i];
+          var race = i < Model.Races.Count ? Model.Races[i] : null;
+          <div class="swiper-slide">
+            <img src="@img" alt="Track @i" loading="lazy" />
+            <div class="position-absolute bottom-0 start-0 p-3 text-white">
+              <h5 class="mb-1">@((race!=null)?race.Name:"Upcoming Race")</h5>
+              <div class="small">@((race!=null)?race.Location:"Location") — @((race!=null)?race.Date.ToString("yyyy-MM-dd"):"")</div>
+              <div class="mt-2"><a class="btn btn-sm btn-outline-light" href="#">View details (coming soon)</a></div>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+  }
+  else
+  {
+    <div class="alert alert-warning">No track images found. Add PNGs named 1.png,2.png... in src/F1.Web/wwwroot/images2/ to enable the tracks carousel. <!-- TODO: add images2 --></div>
+  }
 </div>
