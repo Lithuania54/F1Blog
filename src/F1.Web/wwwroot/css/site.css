@@ -1,25 +1,36 @@
 /* Minimal site styles for Bootstrap + Swiper integration */
 :root{--accent:#E10600}
-body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:#07070a;color:#e6e6e6}
+/* Minimal site styles for Bootstrap + Swiper integration */
+:root{--accent:#E10600}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:#07070a;color:#e6e6e6;margin:0}
 .prose img{border-radius:6px}
 a:focus{outline:3px solid rgba(225,16,0,0.18);outline-offset:2px}
 
-/* Carousel aspect ratio: 16:7 */
-.hero-swiper{width:100%;position:relative}
-.hero-swiper .swiper-slide{height:0;padding-bottom:43.75%;position:relative;overflow:hidden}
-.hero-swiper .swiper-slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* Ensure navbar renders above the absolute-positioned hero overlay */
+.navbar{position:relative;z-index:30}
 
-/* Tracks carousel */
-.tracks-swiper .swiper-slide{height:0;padding-bottom:50%;position:relative;overflow:hidden}
-.tracks-swiper .swiper-slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* Full-page hero carousel */
+.home-hero{position:relative;min-height:calc(100vh - 56px);/* 56px default navbar height */overflow:hidden}
+.hero-overlay{position:absolute;top:56px;left:0;right:0;height:calc(100vh - 56px);display:flex;align-items:center;justify-content:center;pointer-events:none}
+.hero-title{font-size:clamp(2rem,5vw,4rem);color:#fff;margin:0;text-align:center;z-index:2}
 
-/* Standings table leader highlight */
-.leader-row{background:rgba(225,16,0,0.08);font-weight:600}
+.hero-swiper{width:100%;height:100%;position:relative}
+.hero-swiper .swiper-slide{width:100%;height:100%;display:block}
+.hero-swiper .swiper-slide img{width:100%;height:100%;object-fit:cover;display:block}
 
-/* Blog cards */
-.blog-card img{width:100%;height:160px;object-fit:cover}
+/* Ensure Swiper nav buttons show a visible focus outline for keyboard users */
+.swiper-button-next:focus,
+.swiper-button-prev:focus{
+	outline:3px solid rgba(225,16,0,0.28);
+	outline-offset:4px;
+}
+
+/* No-JS fallback hero */
+.no-js-hero{height:60vh;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem}
 
 /* small helpers */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+/* TODO: remove unused utilities from previous designs or consolidate into a small utility stylesheet */
 
 

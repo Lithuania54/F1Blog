@@ -3,6 +3,7 @@
 bin/
 obj/
 images/
+images2/
 **/bin/
 **/obj/
 *.user

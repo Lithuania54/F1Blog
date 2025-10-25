@@ -6,8 +6,15 @@ namespace F1.Web.Pages.Races;
 
 public class IndexModel : PageModel
 {
+    private readonly IWebHostEnvironment _env;
+
     public List<RaceItem> Races { get; set; } = new();
     public List<string> TrackImageUrls { get; set; } = new();
+
+    public IndexModel(IWebHostEnvironment env)
+    {
+        _env = env;
+    }
 
     public void OnGet()
     {
@@ -22,11 +29,35 @@ public class IndexModel : PageModel
             }
         }
 
-        // Detect track images in wwwroot/images2 or ContentRootPath/images2
-        var webRoot = Path.Combine(Directory.GetCurrentDirectory(), "src", "F1.Web", "wwwroot");
-        var wwwImgDir = Path.Combine(webRoot, "images2");
-        var repoImgDir = Path.Combine(Directory.GetCurrentDirectory(), "src", "F1.Web", "images2");
-        for (int i = 1; i <= 20; i++)
+        // Detect track images in wwwroot/images2 or ContentRootPath/images2 by enumerating files.
+    var webRoot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+    var wwwImgDir = Path.Combine(webRoot, "images2");
+    var repoImgDir = Path.Combine(_env.ContentRootPath, "images2");
+
+        var names = new List<string>();
+        if (Directory.Exists(wwwImgDir))
+        {
+            var files = Directory.GetFiles(wwwImgDir)
+                .Select(Path.GetFileName)
+                .Where(n => !string.IsNullOrWhiteSpace(n))
+                .Select(n => n!)
+                .ToArray();
+            names.AddRange(files);
+        }
+        if (Directory.Exists(repoImgDir))
+        {
+            var files = Directory.GetFiles(repoImgDir)
+                .Select(Path.GetFileName)
+                .Where(n => !string.IsNullOrWhiteSpace(n))
+                .Select(n => n!)
+                .ToArray();
+            names.AddRange(files);
+        }
+
+        // Prefer numeric carousel images named 1.png .. 24.png in wwwroot/images2
+        // or src/F1.Web/images2 (dev convenience). This enforces the exact
+        // sequence requested by the user.
+        for (int i = 1; i <= 24; i++)
         {
             var fileName = i + ".png";
             var p1 = Path.Combine(wwwImgDir, fileName);

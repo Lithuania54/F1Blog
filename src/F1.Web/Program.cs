@@ -40,6 +40,7 @@ Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "content
 // during development. We will also serve that folder at the request path `/images` so
 // the carousel can reference `/images/1.avif` without copying files.
 Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "images"));
+Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "images2"));
 
 // Serve files from wwwroot (default)
 app.UseStaticFiles();
@@ -52,6 +53,13 @@ app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "images")),
     RequestPath = "/images"
+});
+// Also serve repository-level images2 folder at request path /images2 so
+// developers can keep track/track assets in src/F1.Web/images2 during development.
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "images2")),
+    RequestPath = "/images2"
 });
 app.UseRouting();
 app.UseSerilogRequestLogging();

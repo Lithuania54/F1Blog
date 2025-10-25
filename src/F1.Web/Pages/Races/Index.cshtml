@@ -8,7 +8,7 @@
 
 <div class="container py-5 mt-5">
   <h1 class="h4 mb-3">Races</h1>
-  @if(Model.TrackImageUrls.Any() && Model.Races.Any())
+  @if(Model.TrackImageUrls.Any())
   {
     <div id="tracksSwiper" class="swiper tracks-swiper" data-tracks='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TrackImageUrls))'>
       <div class="swiper-wrapper">
@@ -33,6 +33,6 @@
   }
   else
   {
-    <div class="alert alert-warning">No track images found. Add PNGs named 1.png,2.png... in src/F1.Web/wwwroot/images2/ to enable the tracks carousel. <!-- TODO: add images2 --></div>
+    <div class="alert alert-warning">No track images found. Add image files (PNG/AVIF/JPG/WEBP) to <code>src/F1.Web/wwwroot/images2/</code> or <code>src/F1.Web/images2/</code> to enable the tracks carousel.</div>
   }
 </div>

@@ -1,13 +1,13 @@
-@using Microsoft.AspNetCore.Mvc.Routing
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    var current = HttpContextAccessor?.HttpContext?.Request?.Path.Value?.ToLowerInvariant() ?? "/";
-    Func<string,bool> active = p => current.StartsWith(p.ToLowerInvariant());
+    var current = HttpContextAccessor?.HttpContext?.Request?.Path.Value ?? "/";
+    bool IsActive(string path) => current.StartsWith(path, StringComparison.OrdinalIgnoreCase);
 }
 
-@* Bootstrap 5 navbar: Brand on left, links on right. Uses collapse for mobile. *@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" aria-label="Main navigation">
+<!-- Navbar: Bootstrap 5 responsive, accessible, three links only -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation" aria-label="Main navigation">
   <div class="container-fluid">
     <a class="navbar-brand" asp-page="/Index">Drive the Story</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,16 +16,18 @@
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link @(active("/standings")?"active":"")" aria-current="@(active("/standings")?"page":null)" asp-page="/Standings/Index">Standings</a>
+          <a class="nav-link @(IsActive("/Races")?"active":"")" asp-page="/Races/Index" aria-current="@(IsActive("/Races")?"page":null)">Races</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link @(active("/races")?"active":"")" aria-current="@(active("/races")?"page":null)" asp-page="/Races/Index">Races</a>
+          <a class="nav-link @(IsActive("/Standings")?"active":"")" asp-page="/Standings/Index" aria-current="@(IsActive("/Standings")?"page":null)">Standings</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link @(active("/blogs")?"active":"")" aria-current="@(active("/blogs")?"page":null)" asp-page="/Blogs/Index">Blogs</a>
+          <a class="nav-link @(IsActive("/Blogs")?"active":"")" asp-page="/Blogs/Index" aria-current="@(IsActive("/Blogs")?"page":null)">Blogs</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
+
+<!-- TODO: Human review: adjust brand text or link if desired -->
 

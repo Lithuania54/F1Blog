@@ -1,86 +1,107 @@
-// Index page: detects carousel images from either `wwwroot/images/` or
-// `ContentRootPath/images/` (repo-level). The CarouselImageUrls property is
-// produced server-side and consumed by the carousel JS via the data-images
-// attribute. To move images to production, copy files into
-// `src/F1.Web/wwwroot/images/` so they are served by the default static
-// file provider.
-// ASSUMPTION: images named 1.avif..10.avif (or common image extensions).
-using System.Text.Json;
-using F1.Web.Models;
-using F1.Web.Services;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
-namespace F1.Web.Pages;
-
-public class IndexModel : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
+namespace F1.Web.Pages
 {
-    private readonly MarkdownService _md;
-    private readonly IWebHostEnvironment _env;
-
-    public List<RenderedPost> Posts { get; set; } = new();
-    public List<Driver> Drivers { get; set; } = new();
-    public List<RaceItem> Races { get; set; } = new();
-    public List<CaseStudy> Works { get; set; } = new();
-    public RaceItem? NextRace => Races.OrderBy(r => r.Date).FirstOrDefault();
-    // CarouselImageUrls: URLs that will be consumed by the client carousel.
-    // ASSUMPTION: images are named 1.avif..10.avif (or PNG/JPG/WebP). We prefer
-    // `wwwroot/images/` so the browser can fetch `/images/...`. If missing there,
-    // files under the repository-level `src/F1.Web/images/` (ContentRootPath/images)
-    // are also served via the static file mapping in Program.cs (development convenience).
-    public List<string> CarouselImageUrls { get; set; } = new();
-
-    public IndexModel(MarkdownService md, IWebHostEnvironment env)
+    // Index page: detects carousel images from either `wwwroot/images/` or
+    // `ContentRootPath/images/` (repo-level). The CarouselImageUrls property is
+    // produced server-side and consumed by the carousel view.
+    // To move images to production, copy files into
+    // `src/F1.Web/wwwroot/images/` so they are served by the default static
+    // file provider. Alternatively, see the Program.cs snippet below to serve
+    // repo-level images at the /images path in development.
+    public class IndexModel : PageModel
     {
-        _md = md;
-        _env = env;
-    }
+        private readonly IWebHostEnvironment _env;
+        private readonly ILogger<IndexModel> _logger;
 
-    public void OnGet()
-    {
-        Posts = _md.GetAllPosts().ToList();
+        // CarouselImageUrls: populated from src/F1.Web/wwwroot/images/ expecting 1.avif..10.avif (or png/webp/jpg)
+        public List<string> CarouselImageUrls { get; set; } = new();
 
-        var dataFile = Path.Combine(_env.ContentRootPath, "Data", "sample-data.json");
-        if (System.IO.File.Exists(dataFile))
+        // If no images found, this contains a friendly message for the view.
+        public string? CarouselNotFoundMessage { get; private set; }
+
+        public IndexModel(IWebHostEnvironment env, ILogger<IndexModel> logger)
         {
-            var doc = JsonSerializer.Deserialize<SampleData>(System.IO.File.ReadAllText(dataFile))!;
-            Drivers = doc.Drivers;
-            Races = doc.Races.OrderBy(r => r.Date).ToList();
-            Works = doc.Works;
-        }
-        else
-        {
-            // fallback: empty lists
+            _env = env ?? throw new ArgumentNullException(nameof(env));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        // Determine available carousel images. Check common extensions and prefer
-        // wwwroot/images first so the browser can request /images/<file>. If not
-        // found there, look under ContentRootPath/images which we also expose at
-        // the /images request path via Program.cs static file mapping (dev usage).
-        try
+        public void OnGet()
         {
-            var webRoot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-            var wwwImgDir = Path.Combine(webRoot, "images");
-            var repoImgDir = Path.Combine(_env.ContentRootPath, "images");
-            // Only allow AVIF images named 1.avif .. 10.avif per requirement.
-            for (int i = 1; i <= 10; i++)
+            try
             {
-                var fileName = i + ".avif";
-                var p1 = Path.Combine(wwwImgDir, fileName);
-                var p2 = Path.Combine(repoImgDir, fileName);
-                if (System.IO.File.Exists(p1))
+                var webRoot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+                var wwwImagesDir = Path.Combine(webRoot, "images");
+                var repoImagesDir = Path.Combine(_env.ContentRootPath, "images");
+
+                // Preferred extensions to check (order matters)
+                var preferredExts = new[] { ".png", ".avif", ".webp", ".jpg", ".jpeg" };
+
+                // If neither location exists, bail early with a friendly message
+                if (!Directory.Exists(wwwImagesDir) && !Directory.Exists(repoImagesDir))
                 {
-                    CarouselImageUrls.Add($"/images/{fileName}");
+                    _logger.LogWarning("Carousel images directories not found: {WwwImagesDir} or {RepoImagesDir}. Place 1.png..10.png into one of these paths.", wwwImagesDir, repoImagesDir);
+                    CarouselNotFoundMessage = "No carousel images found. Add 1.png..10.png (or 1.avif..1.webp) to src/F1.Web/wwwroot/images/ or src/F1.Web/images/ to enable the hero carousel.";
+                    return;
                 }
-                else if (System.IO.File.Exists(p2))
+
+                // For each index 1..10 pick the first available extension in preferredExts,
+                // and prefer webroot images over repo-level images.
+                for (int i = 1; i <= 10; i++)
                 {
-                    CarouselImageUrls.Add($"/images/{fileName}");
+                    var added = false;
+                    foreach (var ext in preferredExts)
+                    {
+                        var fileName = $"{i}{ext}";
+
+                        // check webroot (static) first
+                        if (Directory.Exists(wwwImagesDir))
+                        {
+                            var physicalWww = Path.Combine(wwwImagesDir, fileName);
+                            if (System.IO.File.Exists(physicalWww))
+                            {
+                                CarouselImageUrls.Add($"/images/{fileName}");
+                                added = true;
+                                break;
+                            }
+                        }
+
+                        // check repo-level images folder next
+                        if (Directory.Exists(repoImagesDir))
+                        {
+                            var physicalRepo = Path.Combine(repoImagesDir, fileName);
+                            if (System.IO.File.Exists(physicalRepo))
+                            {
+                                // NOTE: serving repo images at /images requires static file mapping in Program.cs (see snippet)
+                                CarouselImageUrls.Add($"/images/{fileName}");
+                                added = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // continue if no file for this index; do not log noise
+                }
+
+                if (!CarouselImageUrls.Any())
+                {
+                    CarouselNotFoundMessage = "No carousel images found. Add files named 1.png..10.png (or 1.avif..1.webp) to src/F1.Web/wwwroot/images/ or src/F1.Web/images/.";
+                    _logger.LogInformation("No carousel images (1..10) were found under {WwwImagesDir} or {RepoImagesDir}", wwwImagesDir, repoImagesDir);
                 }
             }
-        }
-        catch
-        {
-            // ignore and allow fallback
-        }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while scanning carousel images");
+                CarouselNotFoundMessage = "Unable to load hero images at the moment.";
+            }
 
-        // If none found, leave CarouselImageUrls empty — view will show a neutral hero.
+            // TODO: For production, store canonical images in a CDN or managed assets bucket and reference them here.
+        }
     }
 }
