@@ -1,9 +1,9 @@
-// Program.cs (modified):
-// - Adds a static-file mapping so repository-level images (ContentRootPath/images)
-//   are served at the request path /images during development.
-// - For production, copy images into src/F1.Web/wwwroot/images/ so default
-//   static file provider serves them. See the TODO comments in IndexModel.
-// ASSUMPTION: Developers may keep images in repo under src/images/ for convenience.
+// Program.cs (final fixed version)
+// - Registers IHttpContextAccessor for navbar injection
+// - Keeps Serilog logging
+// - Maps static folders for /images and /images2
+// - Ensures all required directories exist
+
 using System.Text.Json;
 using Markdig;
 using Serilog;
@@ -12,7 +12,9 @@ using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Serilog (simple, reads appsettings if present)
+// --------------------
+// Serilog Configuration
+// --------------------
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -21,46 +23,58 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// Razor Pages
+// --------------------
+// Services Registration
+// --------------------
 builder.Services.AddRazorPages();
+builder.Services.AddHttpContextAccessor(); // ✅ Needed for _Nav.cshtml
 
-// Services
+// Application Services
 builder.Services.AddSingleton<MarkdownService>();
 builder.Services.AddSingleton<NewsletterService>();
 builder.Services.AddSingleton<ContactService>();
 
 var app = builder.Build();
 
-// Ensure storage and content folders exist
-var storagePath = Path.Combine(app.Environment.ContentRootPath, "storage");
-Directory.CreateDirectory(storagePath);
-Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "content", "posts"));
-// Ensure a development-level `src/images` folder exists for repository-stored images.
-// ASSUMPTION: Developers may keep images in `src/images/` (one level above this project)
-// during development. We will also serve that folder at the request path `/images` so
-// the carousel can reference `/images/1.avif` without copying files.
-Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "images"));
-Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "images2"));
+// --------------------
+// Directory Setup
+// --------------------
+var contentRoot = app.Environment.ContentRootPath;
 
-// Serve files from wwwroot (default)
+var storagePath = Path.Combine(contentRoot, "storage");
+var postsPath = Path.Combine(contentRoot, "content", "posts");
+var imagesPath = Path.Combine(contentRoot, "images");
+var images2Path = Path.Combine(contentRoot, "images2");
+
+Directory.CreateDirectory(storagePath);
+Directory.CreateDirectory(postsPath);
+Directory.CreateDirectory(imagesPath);
+Directory.CreateDirectory(images2Path);
+
+// --------------------
+// Static File Setup
+// --------------------
+
+// Default static file provider (wwwroot)
 app.UseStaticFiles();
 
-// Also serve images from ContentRootPath/images at request path /images.
-// This allows putting images in the repository root `src/images/` during development
-// and have them available at `/images/...`. For production, copy images into
-// `src/F1.Web/wwwroot/images/` so the default static file provider serves them.
+// Serve images from ContentRootPath/images at /images
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "images")),
+    FileProvider = new PhysicalFileProvider(imagesPath),
     RequestPath = "/images"
 });
-// Also serve repository-level images2 folder at request path /images2 so
-// developers can keep track/track assets in src/F1.Web/images2 during development.
+
+// Serve secondary images (race tracks) from /images2
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "images2")),
+    FileProvider = new PhysicalFileProvider(images2Path),
     RequestPath = "/images2"
 });
+
+// --------------------
+// Middleware Pipeline
+// --------------------
 app.UseRouting();
 app.UseSerilogRequestLogging();
 
@@ -72,4 +86,7 @@ if (!app.Environment.IsDevelopment())
 
 app.MapRazorPages();
 
+// --------------------
+// Run Application
+// --------------------
 app.Run();

@@ -8,19 +8,12 @@ using Microsoft.Extensions.Logging;
 
 namespace F1.Web.Pages
 {
-    // Index page: detects carousel images from either `wwwroot/images/` or
-    // `ContentRootPath/images/` (repo-level). The CarouselImageUrls property is
-    // produced server-side and consumed by the carousel view.
-    // To move images to production, copy files into
-    // `src/F1.Web/wwwroot/images/` so they are served by the default static
-    // file provider. Alternatively, see the Program.cs snippet below to serve
-    // repo-level images at the /images path in development.
     public class IndexModel : PageModel
     {
         private readonly IWebHostEnvironment _env;
         private readonly ILogger<IndexModel> _logger;
 
-        // CarouselImageUrls: populated from src/F1.Web/wwwroot/images/ expecting 1.avif..10.avif (or png/webp/jpg)
+        // CarouselImageUrls: populated from src/F1.Web/wwwroot/images/ expecting 1..10 with common extensions
         public List<string> CarouselImageUrls { get; set; } = new();
 
         // If no images found, this contains a friendly message for the view.
@@ -46,16 +39,15 @@ namespace F1.Web.Pages
                 // If neither location exists, bail early with a friendly message
                 if (!Directory.Exists(wwwImagesDir) && !Directory.Exists(repoImagesDir))
                 {
-                    _logger.LogWarning("Carousel images directories not found: {WwwImagesDir} or {RepoImagesDir}. Place 1.png..10.png into one of these paths.", wwwImagesDir, repoImagesDir);
+                    _logger.LogWarning("Carousel images directories not found: {WwwImagesDir} or {RepoImagesDir}. Place 1..10 images into one of these paths.", wwwImagesDir, repoImagesDir);
                     CarouselNotFoundMessage = "No carousel images found. Add 1.png..10.png (or 1.avif..1.webp) to src/F1.Web/wwwroot/images/ or src/F1.Web/images/ to enable the hero carousel.";
                     return;
                 }
 
                 // For each index 1..10 pick the first available extension in preferredExts,
-                // and prefer webroot images over repo-level images.
+                // preferring webroot images over repo-level images.
                 for (int i = 1; i <= 10; i++)
                 {
-                    var added = false;
                     foreach (var ext in preferredExts)
                     {
                         var fileName = $"{i}{ext}";
@@ -67,8 +59,7 @@ namespace F1.Web.Pages
                             if (System.IO.File.Exists(physicalWww))
                             {
                                 CarouselImageUrls.Add($"/images/{fileName}");
-                                added = true;
-                                break;
+                                break; // found for this index, continue to next index
                             }
                         }
 
@@ -78,15 +69,12 @@ namespace F1.Web.Pages
                             var physicalRepo = Path.Combine(repoImagesDir, fileName);
                             if (System.IO.File.Exists(physicalRepo))
                             {
-                                // NOTE: serving repo images at /images requires static file mapping in Program.cs (see snippet)
+                                // NOTE: serving repo images at /images requires static file mapping in Program.cs (optional)
                                 CarouselImageUrls.Add($"/images/{fileName}");
-                                added = true;
-                                break;
+                                break; // found for this index
                             }
                         }
                     }
-
-                    // continue if no file for this index; do not log noise
                 }
 
                 if (!CarouselImageUrls.Any())
