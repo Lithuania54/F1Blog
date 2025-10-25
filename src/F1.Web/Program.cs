@@ -1,14 +1,16 @@
-// Program.cs (final fixed version)
+// Program.cs (final version with Identity + existing features)
+// - Registers ASP.NET Core Identity (login/register system)
 // - Registers IHttpContextAccessor for navbar injection
 // - Keeps Serilog logging
 // - Maps static folders for /images and /images2
 // - Ensures all required directories exist
 
-using System.Text.Json;
-using Markdig;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 using F1.Web.Services;
-using Microsoft.Extensions.FileProviders;
+using F1.Web.Data; // ✅ Add this namespace after you create ApplicationDbContext.cs
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,13 +26,25 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // --------------------
+// Database + Identity Setup
+// --------------------
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") 
+                      ?? "Data Source=f1blog.db"));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>();
+
+// --------------------
 // Services Registration
 // --------------------
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor(); // ✅ Needed for _Nav.cshtml
 
 // Application Services
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<MarkdownService>();
 builder.Services.AddSingleton<NewsletterService>();
 builder.Services.AddSingleton<ContactService>();
@@ -79,6 +93,9 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 app.UseSerilogRequestLogging();
 
+app.UseAuthentication(); // ✅ Identity middleware
+app.UseAuthorization();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -87,7 +104,4 @@ if (!app.Environment.IsDevelopment())
 
 app.MapRazorPages();
 
-// --------------------
-// Run Application
-// --------------------
 app.Run();
