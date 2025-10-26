@@ -1,11 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using YourProjectNamespace.Data; // Replace with your actual namespace
-using YourProjectNamespace.Models; // Replace with your actual namespace
+using F1.Web.Data;
+using F1.Web.Models;
 using System.Threading.Tasks;
 
-namespace YourProjectNamespace.Pages.Blog
+namespace F1.Web.Pages.Blogs
 {
+    [Authorize] // only authenticated users can create posts
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -16,11 +18,10 @@ namespace YourProjectNamespace.Pages.Blog
         }
 
         [BindProperty]
-        public Post Post { get; set; }
+        public Post Post { get; set; } = new Post();
 
         public void OnGet()
         {
-            // Any initialization if needed
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -33,8 +34,7 @@ namespace YourProjectNamespace.Pages.Blog
             _context.Posts.Add(Post);
             await _context.SaveChangesAsync();
 
-            // Redirect back to the index page after successful creation
-            return RedirectToPage("./Index");
+            return RedirectToPage("/Blogs/Index");
         }
     }
 }

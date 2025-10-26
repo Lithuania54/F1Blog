@@ -1,16 +1,17 @@
-// Program.cs (final version with Identity + existing features)
+// Program.cs (recommended final version)
 // - Registers ASP.NET Core Identity (login/register system)
 // - Registers IHttpContextAccessor for navbar injection
 // - Keeps Serilog logging
 // - Maps static folders for /images and /images2
 // - Ensures all required directories exist
+// - Applies pending EF migrations on startup (development convenience)
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
 using F1.Web.Services;
-using F1.Web.Data; // ✅ Add this namespace after you create ApplicationDbContext.cs
+using F1.Web.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,8 +30,11 @@ builder.Host.UseSerilog();
 // Database + Identity Setup
 // --------------------
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") 
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
                       ?? "Data Source=f1blog.db"));
+
+// helpful developer page for EF errors
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
@@ -42,7 +46,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 // Services Registration
 // --------------------
 builder.Services.AddRazorPages();
-builder.Services.AddHttpContextAccessor(); // ✅ Needed for _Nav.cshtml
+builder.Services.AddHttpContextAccessor(); // Needed for _Nav.cshtml
 
 // Application Services
 builder.Services.AddSingleton<MarkdownService>();
@@ -90,18 +94,49 @@ app.UseStaticFiles(new StaticFileOptions
 // --------------------
 // Middleware Pipeline
 // --------------------
-app.UseRouting();
-app.UseSerilogRequestLogging();
-
-app.UseAuthentication(); // ✅ Identity middleware
-app.UseAuthorization();
-
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    // show EF Core database error page for developers
+    app.UseMigrationsEndPoint();
+}
+else
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseSerilogRequestLogging();
+
+app.UseAuthentication(); // Identity
+app.UseAuthorization();
+
 app.MapRazorPages();
 
+// --------------------
+// Apply pending EF migrations on startup (development convenience)
+// --------------------
+try
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var db = services.GetRequiredService<ApplicationDbContext>();
+        // In dev this will apply migrations automatically. In production you may prefer manual migration.
+        db.Database.Migrate();
+    }
+}
+catch (Exception ex)
+{
+    // Avoid crashing the app on migration errors; Serilog is already configured.
+    Log.Error(ex, "An error occurred while migrating or initializing the database.");
+}
+
+// --------------------
+// Run Application
+// --------------------
 app.Run();
