@@ -1,0 +1,85 @@
+@page
+@model F1.Web.Pages.Blogs.CreateModel
+@using Microsoft.AspNetCore.Authorization
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Write Blog";
+}
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <h2 class="mb-4">Write a new blog</h2>
+
+      <form method="post" id="createPostForm">
+        <div class="mb-3">
+          <label for="Title" class="form-label">Title</label>
+          <input asp-for="Post.Title" class="form-control" id="Title" placeholder="Enter title" />
+          <span asp-validation-for="Post.Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Top 3 Hashtags (no #, just words)</label>
+          <div class="d-flex gap-2">
+            <input name="HashtagInputs" class="form-control" placeholder="hashtag1" maxlength="50" />
+            <input name="HashtagInputs" class="form-control" placeholder="hashtag2" maxlength="50" />
+            <input name="HashtagInputs" class="form-control" placeholder="hashtag3" maxlength="50" />
+          </div>
+          <div class="form-text">Will be saved as comma-separated hashtags.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Content blocks (you can add up to 10)</label>
+          <div id="contentBlocks">
+            <!-- initial block -->
+            <textarea name="ContentBlocks" class="form-control mb-2" rows="6" placeholder="Write the first block of the article..."></textarea>
+          </div>
+
+          <div class="mt-2 d-flex gap-2">
+            <button type="button" id="addBlock" class="btn btn-outline-light btn-sm">Add block</button>
+            <button type="button" id="removeBlock" class="btn btn-outline-danger btn-sm">Remove last block</button>
+            <div class="form-text ms-3">You can create up to 10 blocks; they will be joined with paragraph breaks.</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="ImageUrl" class="form-label">Cover image URL (optional)</label>
+          <input asp-for="Post.ImageUrl" class="form-control" id="ImageUrl" placeholder="/images/1.avif or https://..." />
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">Publish</button>
+          <a asp-page="/Blogs/Index" class="btn btn-outline-light">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+  <script>
+    (function() {
+      const container = document.getElementById('contentBlocks');
+      const addBtn = document.getElementById('addBlock');
+      const remBtn = document.getElementById('removeBlock');
+      const maxBlocks = 10;
+
+      addBtn.addEventListener('click', () => {
+        const blocks = container.querySelectorAll('textarea[name="ContentBlocks"]');
+        if (blocks.length >= maxBlocks) return;
+        const ta = document.createElement('textarea');
+        ta.name = "ContentBlocks";
+        ta.className = "form-control mb-2";
+        ta.rows = 6;
+        ta.placeholder = `Write block ${blocks.length + 1}...`;
+        container.appendChild(ta);
+      });
+
+      remBtn.addEventListener('click', () => {
+        const blocks = container.querySelectorAll('textarea[name="ContentBlocks"]');
+        if (blocks.length <= 1) return;
+        container.removeChild(blocks[blocks.length - 1]);
+      });
+    })();
+  </script>
+}

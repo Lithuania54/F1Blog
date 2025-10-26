@@ -13,10 +13,16 @@ namespace F1.Web.Models
         [Required]
         public string Content { get; set; } = string.Empty;
 
+        // Comma-separated hashtags, e.g. "f1,monaco,tesla"
+        public string? Hashtags { get; set; }
+
         public string? ImageUrl { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public string? AuthorId { get; set; } // IdentityUser.Id
+
+        // Optional: if you want to store the display name at creation
+        public string? AuthorName { get; set; }
     }
 }
