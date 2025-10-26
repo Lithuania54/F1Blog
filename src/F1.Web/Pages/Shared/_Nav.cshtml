@@ -1,19 +1,17 @@
-@* Pages/Shared/_Nav.cshtml *@
-@using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Identity
-@inject IHttpContextAccessor HttpContextAccessor
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    // Detect current route for active state
+    // Normalized path (lowercase, no trailing slash)
     var path = HttpContextAccessor?.HttpContext?.Request?.Path.Value?.TrimEnd('/')?.ToLowerInvariant() ?? "/";
     bool IsActivePrefix(string p) => path.StartsWith(p.TrimEnd('/').ToLowerInvariant());
 }
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" role="navigation" aria-label="Main navigation">
   <div class="container-fluid">
-    <a class="navbar-brand fw-bold" href="/">Drive the Story</a>
+    <a class="navbar-brand fw-bold" asp-page="/Index">Drive the Story</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
             aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -22,48 +20,46 @@
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link @(IsActivePrefix("/races") ? "active" : "")" href="/Races">Races</a>
+          <a class="nav-link @(IsActivePrefix("/races") ? "active" : "")" asp-page="/Races/Index">Races</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link @(IsActivePrefix("/standings") ? "active" : "")" href="/Standings">Standings</a>
+          <a class="nav-link @(IsActivePrefix("/standings") ? "active" : "")" asp-page="/Standings/Index">Standings</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link @(IsActivePrefix("/blogs") ? "active" : "")" href="/Blogs">Blogs</a>
+          <a class="nav-link @(IsActivePrefix("/blogs") ? "active" : "")" asp-page="/Blogs/Index">Blogs</a>
         </li>
 
         @if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-      <a class="nav-link @(IsActivePrefix("/blogs/create") ? "active" : "")" href="/Blogs/Create" asp-page="/Blogs/Create">Write Blog</a>
-    </li>
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        @User.Identity?.Name
-      </a>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-        <li>
-          <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" href="/Identity/Account/Manage">Profile</a>
-        </li>
-        <li>
-          <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
-            <button type="submit" class="dropdown-item">Logout</button>
-          </form>
-        </li>
-      </ul>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-      <a class="nav-link @(IsActivePrefix("/identity/account/login") ? "active" : "")"
-         asp-area="Identity" asp-page="/Account/Login" href="/Identity/Account/Login">Login</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link @(IsActivePrefix("/identity/account/register") ? "active" : "")"
-         asp-area="Identity" asp-page="/Account/Register" href="/Identity/Account/Register">Register</a>
-    </li>
-}
+        {
+            <li class="nav-item">
+              <a class="nav-link @(IsActivePrefix("/blogs/create") ? "active" : "")" asp-page="/Blogs/Create">Write Blog</a>
+            </li>
 
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                @User.Identity?.Name
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <li>
+                  <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Profile</a>
+                </li>
+                <li>
+                  <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                    <button type="submit" class="dropdown-item">Logout</button>
+                  </form>
+                </li>
+              </ul>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+              <a class="nav-link @(IsActivePrefix("/identity/account/login") ? "active" : "")" asp-area="Identity" asp-page="/Account/Login">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link @(IsActivePrefix("/identity/account/register") ? "active" : "")" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            </li>
+        }
       </ul>
     </div>
   </div>
