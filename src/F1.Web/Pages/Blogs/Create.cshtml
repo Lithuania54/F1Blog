@@ -1,6 +1,5 @@
 @page
 @model F1.Web.Pages.Blogs.CreateModel
-@using Microsoft.AspNetCore.Authorization
 @{
     Layout = "~/Pages/Shared/_Layout.cshtml";
     ViewData["Title"] = "Write Blog";
@@ -12,18 +11,20 @@
       <h2 class="mb-4">Write a new blog</h2>
 
       <form method="post" id="createPostForm">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
         <div class="mb-3">
-          <label for="Title" class="form-label">Title</label>
-          <input asp-for="Post.Title" class="form-control" id="Title" placeholder="Enter title" />
+          <label asp-for="Post.Title" class="form-label">Title</label>
+          <input asp-for="Post.Title" class="form-control" />
           <span asp-validation-for="Post.Title" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Top 3 Hashtags (no #, just words)</label>
+          <label class="form-label">Top 3 hashtags (no #)</label>
           <div class="d-flex gap-2">
-            <input name="HashtagInputs" class="form-control" placeholder="hashtag1" maxlength="50" />
-            <input name="HashtagInputs" class="form-control" placeholder="hashtag2" maxlength="50" />
-            <input name="HashtagInputs" class="form-control" placeholder="hashtag3" maxlength="50" />
+            <input name="HashtagInputs" class="form-control" placeholder="hashtag1" maxlength="40" />
+            <input name="HashtagInputs" class="form-control" placeholder="hashtag2" maxlength="40" />
+            <input name="HashtagInputs" class="form-control" placeholder="hashtag3" maxlength="40" />
           </div>
           <div class="form-text">Will be saved as comma-separated hashtags.</div>
         </div>
@@ -31,20 +32,20 @@
         <div class="mb-3">
           <label class="form-label">Content blocks (you can add up to 10)</label>
           <div id="contentBlocks">
-            <!-- initial block -->
-            <textarea name="ContentBlocks" class="form-control mb-2" rows="6" placeholder="Write the first block of the article..."></textarea>
+            <textarea name="ContentBlocks" class="form-control mb-2" rows="6" placeholder="Write the first block..."></textarea>
           </div>
 
           <div class="mt-2 d-flex gap-2">
             <button type="button" id="addBlock" class="btn btn-outline-light btn-sm">Add block</button>
             <button type="button" id="removeBlock" class="btn btn-outline-danger btn-sm">Remove last block</button>
-            <div class="form-text ms-3">You can create up to 10 blocks; they will be joined with paragraph breaks.</div>
+            <div class="form-text ms-3">Max 10 blocks; they will be joined with paragraph breaks.</div>
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="ImageUrl" class="form-label">Cover image URL (optional)</label>
-          <input asp-for="Post.ImageUrl" class="form-control" id="ImageUrl" placeholder="/images/1.avif or https://..." />
+          <label asp-for="Post.ImageUrl" class="form-label">Cover image URL (optional)</label>
+          <input asp-for="Post.ImageUrl" class="form-control" placeholder="/images/1.avif or https://..." />
+          <span asp-validation-for="Post.ImageUrl" class="text-danger"></span>
         </div>
 
         <div class="d-flex gap-2">
@@ -57,6 +58,8 @@
 </div>
 
 @section Scripts {
+  @* Remove the broken partial and keep your JavaScript here *@
+
   <script>
     (function() {
       const container = document.getElementById('contentBlocks');

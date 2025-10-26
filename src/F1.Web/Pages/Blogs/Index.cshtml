@@ -1,38 +1,134 @@
 @page
 @model F1.Web.Pages.Blogs.IndexModel
+@using System.Linq
 @{
-    Layout = "~/Pages/Shared/_Layout.cshtml";
+Layout = "~/Pages/Shared/_Layout.cshtml";
+ViewData["Title"] = "Blogs";
 }
 
-<div class="container py-5 mt-5">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3">Blogs</h1>
-    <form method="get" class="mb-0">
-      <button name="shuffle" value="1" class="btn btn-sm btn-primary">Shuffle</button>
-    </form>
-  </div>
+<div class="container py-5"> <div class="d-flex justify-content-between align-items-center mb-4"> <h1 class="h3 mb-0">Blogs</h1> @if (User?.Identity?.IsAuthenticated == true) { <a asp-page="/Blogs/Create" class="btn btn-primary">Write Blog</a> } </div>
 
-  <div class="row g-4">
-    @foreach(var p in Model.Posts)
-    {
-      <div class="col-12 col-md-6">
-        <div class="card bg-dark text-white blog-card">
-          <img src="@((!string.IsNullOrEmpty(p.ImageUrl))?p.ImageUrl:"/images/1.avif")" class="card-img-top" alt="@p.Title" loading="lazy" />
-          <div class="card-body">
-            <h5 class="card-title">@p.Title</h5>
-            <p class="card-text small text-muted">@p.Date.ToString("yyyy-MM-dd")</p>
-            <p class="card-text">@p.Excerpt</p>
-            <a asp-page="/Blogs/Details" asp-route-slug="@p.Slug" class="btn btn-sm btn-outline-light">Read more</a>
-          </div>
-        </div>
-      </div>
-    }
-  </div>
+@if (!Model.Posts.Any())
+{
+<div class="card bg-transparent border-1 border-secondary p-4 text-center">
+<h2 class="h5">No blogs yet</h2>
+<p class="mb-3 text-muted">There are no published posts right now. Be the first to write one!</p>
+@if (User?.Identity?.IsAuthenticated == true)
+{
+<a asp-page="/Blogs/Create" class="btn btn-outline-light">Create first blog</a>
+}
+else
+{
+<a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-light">Login to write</a>
+}
+</div>
+}
+else
+{
+<div class="row gy-4">
+@foreach (var post in Model.Posts)
+{
+<div class="col-12">
+<article class="card bg-transparent border-0">
+<div class="row g-0 align-items-center">
+@if (!string.IsNullOrEmpty(post.ImageUrl))
+{
+<div class="col-md-4">
+<img src="@post.ImageUrl" alt="@post.Title" class="img-fluid rounded" style="width:100%;height:200px;object-fit:cover" />
+</div>
+<div class="col-md-8">
+<div class="card-body">
+<h2 class="h4 mb-1">
+<a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="text-decoration-none text-white">@post.Title</a>
+</h2>
 
-  <div class="mt-4">
-    @if(Model.HasMore)
-    {
-      <a asp-page="/Blogs/Index" asp-route-pageNumber="@Model.PageNumber + 1" class="btn btn-sm btn-secondary">Next</a>
-    }
-  </div>
+                <div class="mb-2 text-muted small">
+                  @post.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                  @if (!string.IsNullOrEmpty(post.AuthorName))
+                  {
+                      <span> • @post.AuthorName</span>
+                  }
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(post.Hashtags))
+                {
+                    <div class="mb-2">
+                        @{
+                            var tags = post.Hashtags
+                                           .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                           .Select(t => t?.Trim())
+                                           .Where(t => !string.IsNullOrEmpty(t))
+                                           .ToArray();
+                        }
+                        @foreach (var t in tags)
+                        {
+                            <span class="badge bg-secondary me-1">#@t</span>
+                        }
+                    </div>
+                }
+
+                @{
+                    var excerpt = string.IsNullOrEmpty(post.Content)
+                        ? ""
+                        : (post.Content.Length > 300 ? post.Content.Substring(0, 300) + "…" : post.Content);
+                }
+                <p class="mb-2 text-muted">@excerpt</p>
+
+                <a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="btn btn-sm btn-outline-light">Read more</a>
+              </div> <!-- card-body -->
+            </div> <!-- col-md-8 -->
+          }
+          else
+          {
+            <div class="col-12">
+              <div class="card-body">
+                <h2 class="h4 mb-1">
+                  <a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="text-decoration-none text-white">@post.Title</a>
+                </h2>
+
+                <div class="mb-2 text-muted small">
+                  @post.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                  @if (!string.IsNullOrEmpty(post.AuthorName))
+                  {
+                      <span> • @post.AuthorName</span>
+                  }
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(post.Hashtags))
+                {
+                    <div class="mb-2">
+                        @{
+                            var tags = post.Hashtags
+                                           .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                           .Select(t => t?.Trim())
+                                           .Where(t => !string.IsNullOrEmpty(t))
+                                           .ToArray();
+                        }
+                        @foreach (var t in tags)
+                        {
+                            <span class="badge bg-secondary me-1">#@t</span>
+                        }
+                    </div>
+                }
+
+                @{
+                    var excerpt = string.IsNullOrEmpty(post.Content)
+                        ? ""
+                        : (post.Content.Length > 300 ? post.Content.Substring(0, 300) + "…" : post.Content);
+                }
+                <p class="mb-2 text-muted">@excerpt</p>
+
+                <a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="btn btn-sm btn-outline-light">Read more</a>
+              </div> <!-- card-body -->
+            </div> <!-- col-12 -->
+          }
+        </div> <!-- row -->
+      </article>
+    </div>
+  }
+</div>
+
+
+}
+
 </div>

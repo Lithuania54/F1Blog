@@ -1,32 +1,24 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using F1.Web.Services;
+using Microsoft.EntityFrameworkCore;
+using F1.Web.Data;
+using F1.Web.Models;
 
-namespace F1.Web.Pages.Blogs;
-
-public class IndexModel : PageModel
+namespace F1.Web.Pages.Blogs
 {
-    private readonly MarkdownService _md;
-    public List<RenderedPost> Posts { get; set; } = new();
-    public int PageNumber { get; set; } = 1;
-    public int PageSize { get; set; } = 6;
-    public bool HasMore { get; set; }
-
-    public IndexModel(MarkdownService md) => _md = md;
-
-    public void OnGet(int pageNumber = 1, int shuffle = 0)
+    public class IndexModel : PageModel
     {
-        PageNumber = pageNumber;
-        var all = _md.GetAllPosts().ToList();
-        if (shuffle == 1)
+        private readonly ApplicationDbContext _db;
+
+        public IndexModel(ApplicationDbContext db) => _db = db;
+
+        public List<Post> Posts { get; set; } = new();
+
+        public async Task OnGetAsync()
         {
-            var rnd = new Random();
-            all = all.OrderBy(x => rnd.Next()).ToList();
+            Posts = await _db.Posts
+                .AsNoTracking()
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
         }
-        Posts = all.Skip((PageNumber - 1) * PageSize).Take(PageSize).Select(p=>{
-            // Ensure there is a thumbnail URL; ASSUMPTION: posts may include ImageUrl in frontmatter
-            if(string.IsNullOrEmpty(p.ImageUrl)) p.ImageUrl = "/images/1.avif";
-            return p;
-        }).ToList();
-        HasMore = all.Count > PageNumber * PageSize;
     }
 }

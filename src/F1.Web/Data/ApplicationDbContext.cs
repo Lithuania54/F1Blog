@@ -1,19 +1,17 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
+using F1.Web.Models;
 
 namespace F1.Web.Data
 {
-    // IdentityDbContext provides IdentityUser, roles, etc.
-    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+    public class ApplicationDbContext : IdentityDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        // Posts table for blogs
-        public DbSet<F1.Web.Models.Post> Posts { get; set; } = null!;
+        // Add this DbSet for posts
+        public DbSet<Post> Posts { get; set; } = default!;
     }
 }

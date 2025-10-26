@@ -1,22 +1,23 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using F1.Web.Services;
+using Microsoft.EntityFrameworkCore;
+using F1.Web.Data;
+using F1.Web.Models;
 
-namespace F1.Web.Pages.Blogs;
-
-public class DetailsModel : PageModel
+namespace F1.Web.Pages.Blogs
 {
-    private readonly MarkdownService _md;
-    public RenderedPost? Post { get; set; }
-
-    public DetailsModel(MarkdownService md) => _md = md;
-
-    public void OnGet(string? slug)
+    public class DetailsModel : PageModel
     {
-        if (string.IsNullOrEmpty(slug)) return;
-        var file = Path.Combine(Directory.GetCurrentDirectory(), "src", "F1.Web", "content", "posts", slug + ".md");
-        if (System.IO.File.Exists(file))
+        private readonly ApplicationDbContext _db;
+        public DetailsModel(ApplicationDbContext db) => _db = db;
+
+        public Post? Post { get; set; }
+
+        public async Task<IActionResult> OnGetAsync(int id)
         {
-            Post = _md.Load(file);
+            Post = await _db.Posts.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+            if (Post == null) return NotFound();
+            return Page();
         }
     }
 }

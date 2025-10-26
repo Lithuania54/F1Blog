@@ -1,15 +1,38 @@
-@page
+@page "{id:int}"
 @model F1.Web.Pages.Blogs.DetailsModel
 @{
     Layout = "~/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = Model.Post?.Title ?? "Post";
 }
 
-<div class="container py-5 mt-5">
-  <div class="card bg-dark text-white">
-    <div class="card-body">
-      <h1 class="h4">@Model.Post?.Title</h1>
-      <div class="small text-muted mb-3">@Model.Post?.Date.ToString("yyyy-MM-dd")</div>
-      <div class="prose">@Html.Raw(Model.Post?.Html)</div>
+<div class="container py-5">
+  <article class="mx-auto" style="max-width:900px;">
+    <h1 class="display-6">@Model.Post?.Title</h1>
+
+    <div class="text-muted mb-3">
+      @Model.Post?.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+      @if (!string.IsNullOrEmpty(Model.Post?.AuthorName)) { <span> • @Model.Post.AuthorName</span> }
     </div>
-  </div>
+
+    @if (!string.IsNullOrEmpty(Model.Post?.ImageUrl))
+    {
+        <img src="@Model.Post.ImageUrl" alt="cover" class="img-fluid rounded mb-3" style="width:100%;object-fit:cover" />
+    }
+
+    @if (!string.IsNullOrEmpty(Model.Post?.Hashtags))
+    {
+        var tags = Model.Post.Hashtags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        <div class="mb-3">
+            @foreach (var t in tags) { <span class="badge bg-secondary me-1">#@t</span> }
+        </div>
+    }
+
+    <div class="prose text-light">
+      @* Simple rendering of plain/markdown text. If you want Markdown rendering, use Markdig to convert to HTML safely. *@
+      @foreach (var line in (Model.Post?.Content ?? "").Split(new[] { "\n\n" }, StringSplitOptions.None))
+      {
+          <p>@line</p>
+      }
+    </div>
+  </article>
 </div>
