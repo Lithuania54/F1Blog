@@ -7,3 +7,4 @@ public record RaceItem(string Id, string Name, string Location, DateTime Date, s
 public record CaseStudy(string Id, string Title, string Excerpt, string ImageUrl, string Link);
 
 public record SampleData(List<Driver> Drivers, List<RaceItem> Races, List<CaseStudy> Works);
+

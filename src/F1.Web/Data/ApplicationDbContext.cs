@@ -11,7 +11,7 @@ namespace F1.Web.Data
         {
         }
 
-        // Add this DbSet for posts
+        // Add this DbSet
         public DbSet<Post> Posts { get; set; } = default!;
     }
 }

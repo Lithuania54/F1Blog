@@ -1,0 +1,40 @@
+@page "{id:int}"
+@model F1.Web.Pages.Blogs.EditModel
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Edit Blog";
+}
+
+<div class="container py-5">
+  <form method="post">
+    <input type="hidden" asp-for="Post.Id" />
+    <div class="mb-3">
+      <label asp-for="Post.Title" class="form-label">Title</label>
+      <input asp-for="Post.Title" class="form-control" />
+      <span asp-validation-for="Post.Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+      <label asp-for="Post.Hashtags" class="form-label">Hashtags (comma separated)</label>
+      <input asp-for="Post.Hashtags" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+      <label asp-for="Post.Content" class="form-label">Content</label>
+      <textarea asp-for="Post.Content" class="form-control" rows="10"></textarea>
+      <span asp-validation-for="Post.Content" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+      <label asp-for="Post.ImageUrl" class="form-label">Cover image URL</label>
+      <input asp-for="Post.ImageUrl" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-page="/Blogs/Index" class="btn btn-outline-light">Cancel</a>
+  </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -11,22 +11,20 @@ document.addEventListener('DOMContentLoaded', function(){
       const data = el.dataset.images;
       let imgs = [];
       try{ imgs = data ? JSON.parse(data) : []; } catch(e){ console.warn('Failed to parse f1 images', e); }
-      // build slides if any
-      if(imgs.length){
-        const swiper = new Swiper('#f1Swiper', {
-          loop: true,
-          autoplay: { delay: 4000, disableOnInteraction: false },
-          keyboard: { enabled: true },
-          pagination: { el: '.swiper-pagination', clickable: true },
-          navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-          effect: 'slide'
-        });
-        // pause on hover/focus
-        el.addEventListener('mouseenter', ()=>swiper.autoplay.stop());
-        el.addEventListener('mouseleave', ()=>swiper.autoplay.start());
-        el.addEventListener('focusin', ()=>swiper.autoplay.stop());
-        el.addEventListener('focusout', ()=>swiper.autoplay.start());
-      }
+      // Initialize even if slides are pre-rendered without data-images
+      const swiper = new Swiper('#f1Swiper', {
+        loop: imgs.length > 1,
+        autoplay: { delay: 4000, disableOnInteraction: false },
+        keyboard: { enabled: true },
+        pagination: { el: '.swiper-pagination', clickable: true },
+        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+        effect: 'slide'
+      });
+      // pause on hover/focus
+      el.addEventListener('mouseenter', ()=>swiper.autoplay.stop());
+      el.addEventListener('mouseleave', ()=>swiper.autoplay.start());
+      el.addEventListener('focusin', ()=>swiper.autoplay.stop());
+      el.addEventListener('focusout', ()=>swiper.autoplay.start());
     }
 
     // Tracks carousel (id: tracksSwiper, data-tracks attr)
