@@ -63,6 +63,7 @@ namespace F1.Web.Pages.Blogs
                 Post.Content = content;
                 Post.Hashtags = hashtagsCsv;
                 Post.CreatedAt = DateTime.UtcNow;
+                Post.CreatedByUserName = User?.Identity?.Name ?? string.Empty;
 
                 _context.Posts.Add(Post);
                 await _context.SaveChangesAsync();

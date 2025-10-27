@@ -18,6 +18,11 @@ namespace F1.Web.Pages.Blogs
         {
             Post = await _context.Posts.FindAsync(id);
             if (Post == null) return NotFound();
+            var userName = User?.Identity?.Name ?? string.Empty;
+            var isAdmin = User?.IsInRole("Admin") ?? false;
+            var isOwner = !string.IsNullOrWhiteSpace(Post.CreatedByUserName) && string.Equals(Post.CreatedByUserName, userName, StringComparison.Ordinal);
+            var hasNoOwner = string.IsNullOrWhiteSpace(Post.CreatedByUserName);
+            if (!(isOwner || isAdmin || hasNoOwner)) return Forbid();
             return Page();
         }
 
@@ -25,6 +30,12 @@ namespace F1.Web.Pages.Blogs
         {
             var post = await _context.Posts.FindAsync(id);
             if (post == null) return NotFound();
+
+            var userName = User?.Identity?.Name ?? string.Empty;
+            var isAdmin = User?.IsInRole("Admin") ?? false;
+            var isOwner = !string.IsNullOrWhiteSpace(post.CreatedByUserName) && string.Equals(post.CreatedByUserName, userName, StringComparison.Ordinal);
+            var hasNoOwner = string.IsNullOrWhiteSpace(post.CreatedByUserName);
+            if (!(isOwner || isAdmin || hasNoOwner)) return Forbid();
 
             _context.Posts.Remove(post);
             await _context.SaveChangesAsync();

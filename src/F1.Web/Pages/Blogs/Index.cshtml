@@ -77,7 +77,11 @@
 
                       <a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="btn btn-sm btn-outline-light me-2">Read more</a>
 
-                      @if (User?.Identity?.IsAuthenticated == true && (User.Identity?.Name == post.AuthorName || User.IsInRole("Admin")))
+                      @{
+                        var hasNoOwner = string.IsNullOrWhiteSpace(post.CreatedByUserName);
+                        var isOwner = User?.Identity?.IsAuthenticated == true && string.Equals(User.Identity?.Name, post.CreatedByUserName, StringComparison.Ordinal);
+                      }
+                      @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || hasNoOwner || isOwner))
                       {
                           <a asp-page="/Blogs/Edit" asp-route-id="@post.Id" class="btn btn-sm btn-secondary me-1">Edit</a>
                           <a asp-page="/Blogs/Delete" asp-route-id="@post.Id" class="btn btn-sm btn-danger">Delete</a>
@@ -122,7 +126,11 @@
 
                       <a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="btn btn-sm btn-outline-light me-2">Read more</a>
 
-                      @if (User?.Identity?.IsAuthenticated == true && (User.Identity?.Name == post.AuthorName || User.IsInRole("Admin")))
+                      @{
+                        var hasNoOwner = string.IsNullOrWhiteSpace(post.CreatedByUserName);
+                        var isOwner = User?.Identity?.IsAuthenticated == true && string.Equals(User.Identity?.Name, post.CreatedByUserName, StringComparison.Ordinal);
+                      }
+                      @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || hasNoOwner || isOwner))
                       {
                           <a asp-page="/Blogs/Edit" asp-route-id="@post.Id" class="btn btn-sm btn-secondary me-1">Edit</a>
                           <a asp-page="/Blogs/Delete" asp-route-id="@post.Id" class="btn btn-sm btn-danger">Delete</a>

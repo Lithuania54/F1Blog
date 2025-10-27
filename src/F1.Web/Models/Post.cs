@@ -10,8 +10,9 @@ namespace F1.Web.Models
         public string Content { get; set; } = string.Empty;
         public string? ImageUrl { get; set; }
         public string? Hashtags { get; set; }   // stored as "tag1,tag2,tag3"
-    [Required]
-    public string? AuthorName { get; set; }
+        [Required]
+        public string? AuthorName { get; set; } // display name entered by the author
+        public string? CreatedByUserName { get; set; } // actual identity username for ownership
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }

@@ -34,8 +34,8 @@ namespace F1.Web.Pages.Blogs
             // Authorization: author, admin, or any authenticated user if post has no owner
             var userName = User?.Identity?.Name ?? string.Empty;
             var isAdmin = User?.IsInRole("Admin") ?? false;
-            var isOwner = !string.IsNullOrWhiteSpace(post.AuthorName) && string.Equals(post.AuthorName, userName, StringComparison.Ordinal);
-            var hasNoOwner = string.IsNullOrWhiteSpace(post.AuthorName) || string.Equals(post.AuthorName, "Anonymous", StringComparison.OrdinalIgnoreCase);
+            var isOwner = !string.IsNullOrWhiteSpace(post.CreatedByUserName) && string.Equals(post.CreatedByUserName, userName, StringComparison.Ordinal);
+            var hasNoOwner = string.IsNullOrWhiteSpace(post.CreatedByUserName);
 
             if (!(isOwner || isAdmin || hasNoOwner))
                 return Forbid();
@@ -52,8 +52,8 @@ namespace F1.Web.Pages.Blogs
 
             var userName = User?.Identity?.Name ?? string.Empty;
             var isAdmin = User?.IsInRole("Admin") ?? false;
-            var isOwner = !string.IsNullOrWhiteSpace(existing.AuthorName) && string.Equals(existing.AuthorName, userName, StringComparison.Ordinal);
-            var hasNoOwner = string.IsNullOrWhiteSpace(existing.AuthorName) || string.Equals(existing.AuthorName, "Anonymous", StringComparison.OrdinalIgnoreCase);
+            var isOwner = !string.IsNullOrWhiteSpace(existing.CreatedByUserName) && string.Equals(existing.CreatedByUserName, userName, StringComparison.Ordinal);
+            var hasNoOwner = string.IsNullOrWhiteSpace(existing.CreatedByUserName);
 
             if (!(isOwner || isAdmin || hasNoOwner))
                 return Forbid();
@@ -77,7 +77,7 @@ namespace F1.Web.Pages.Blogs
 
                 // Claim ownership if the post had no owner previously
                 if (hasNoOwner && !string.IsNullOrWhiteSpace(userName))
-                    existing.AuthorName = userName;
+                    existing.CreatedByUserName = userName;
 
                 _context.Posts.Update(existing);
                 await _context.SaveChangesAsync();
