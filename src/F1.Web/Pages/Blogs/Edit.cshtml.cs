@@ -31,12 +31,14 @@ namespace F1.Web.Pages.Blogs
             var post = await _context.Posts.FindAsync(id);
             if (post == null) return NotFound();
 
-            // only author or admin may edit
-            var userName = User?.Identity?.Name;
-            if (userName != post.AuthorName && !User.IsInRole("Admin"))
-            {
+            // Authorization: author, admin, or any authenticated user if post has no owner
+            var userName = User?.Identity?.Name ?? string.Empty;
+            var isAdmin = User?.IsInRole("Admin") ?? false;
+            var isOwner = !string.IsNullOrWhiteSpace(post.AuthorName) && string.Equals(post.AuthorName, userName, StringComparison.Ordinal);
+            var hasNoOwner = string.IsNullOrWhiteSpace(post.AuthorName) || string.Equals(post.AuthorName, "Anonymous", StringComparison.OrdinalIgnoreCase);
+
+            if (!(isOwner || isAdmin || hasNoOwner))
                 return Forbid();
-            }
 
             Post = post;
             return Page();
@@ -48,15 +50,16 @@ namespace F1.Web.Pages.Blogs
             var existing = await _context.Posts.FindAsync(id);
             if (existing == null) return NotFound();
 
-            var userName = User?.Identity?.Name;
-            if (userName != existing.AuthorName && !User.IsInRole("Admin"))
-            {
+            var userName = User?.Identity?.Name ?? string.Empty;
+            var isAdmin = User?.IsInRole("Admin") ?? false;
+            var isOwner = !string.IsNullOrWhiteSpace(existing.AuthorName) && string.Equals(existing.AuthorName, userName, StringComparison.Ordinal);
+            var hasNoOwner = string.IsNullOrWhiteSpace(existing.AuthorName) || string.Equals(existing.AuthorName, "Anonymous", StringComparison.OrdinalIgnoreCase);
+
+            if (!(isOwner || isAdmin || hasNoOwner))
                 return Forbid();
-            }
 
             try
             {
-                // Read updated values from the form (support same form layout as Create)
                 var contentBlocks = Request.Form["ContentBlocks"].Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
                 var content = string.Join("\n\n", contentBlocks);
 
@@ -66,12 +69,15 @@ namespace F1.Web.Pages.Blogs
                     .ToArray();
                 var hashtagsCsv = string.Join(',', hashtags);
 
-                // Update allowed fields
                 existing.Title = Request.Form["Post.Title"].FirstOrDefault() ?? existing.Title;
                 existing.Content = string.IsNullOrWhiteSpace(content) ? existing.Content : content;
                 existing.Hashtags = string.IsNullOrWhiteSpace(hashtagsCsv) ? existing.Hashtags : hashtagsCsv;
-                existing.ImageUrl = Request.Form["Post.ImageUrl"].FirstOrDefault() ?? existing.ImageUrl;
+                // Image editing disabled: do not update ImageUrl
                 existing.UpdatedAt = DateTime.UtcNow;
+
+                // Claim ownership if the post had no owner previously
+                if (hasNoOwner && !string.IsNullOrWhiteSpace(userName))
+                    existing.AuthorName = userName;
 
                 _context.Posts.Update(existing);
                 await _context.SaveChangesAsync();

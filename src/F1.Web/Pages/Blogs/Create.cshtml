@@ -20,6 +20,12 @@
         </div>
 
         <div class="mb-3">
+          <label asp-for="Post.AuthorName" class="form-label">Your name (required)</label>
+          <input asp-for="Post.AuthorName" class="form-control" placeholder="Enter your name" />
+          <span asp-validation-for="Post.AuthorName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
           <label class="form-label">Top 3 hashtags (no #)</label>
           <div class="d-flex gap-2">
             <input name="HashtagInputs" class="form-control" placeholder="hashtag1" maxlength="40" />
@@ -42,11 +48,7 @@
           </div>
         </div>
 
-        <div class="mb-3">
-          <label asp-for="Post.ImageUrl" class="form-label">Cover image URL (optional)</label>
-          <input asp-for="Post.ImageUrl" class="form-control" placeholder="/images/1.avif or https://..." />
-          <span asp-validation-for="Post.ImageUrl" class="text-danger"></span>
-        </div>
+        @* Image upload disabled per requirements *@
 
         <div class="d-flex gap-2">
           <button type="submit" class="btn btn-primary">Publish</button>

@@ -1,8 +1,3 @@
-/* Minimal compiled Tailwind-like utilities used by the site.
-   This is a small, focused subset to reproduce layout and color utilities
-   used by the F1 site without requiring the runtime Tailwind CDN.  It is
-   not a full Tailwind build but covers the classes in our markup.
-*/
 :root{
   --accent:#E10600;
   --bg:#0b0b0d;

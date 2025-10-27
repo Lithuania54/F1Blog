@@ -21,9 +21,7 @@
   </div>
 
   <script>
-    // small countdown (next race date passed in via data-next attribute?)
     (function(){
-      // sample next race for local demo; in real app provide from server
       const next = new Date(document.querySelector('meta[name="next-race"]')?.getAttribute('content') || '2025-03-30T15:00:00Z');
       const el = document.getElementById('countdown');
       function tick(){

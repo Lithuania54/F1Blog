@@ -17,8 +17,6 @@
   @if (Model.Posts == null || !Model.Posts.Any())
   {
     <div class="card bg-transparent border-1 border-secondary p-4 text-center">
-      <h2 class="h5">No blogs yet</h2>
-      <p class="mb-3 text-muted">There are no published posts right now. Be the first to write one!</p>
       @if (User?.Identity?.IsAuthenticated == true)
       {
         <a asp-page="/Blogs/Create" class="btn btn-outline-light">Create first blog</a>
@@ -35,7 +33,7 @@
       @foreach (var post in Model.Posts)
       {
         <div class="col-12">
-          <article class="card bg-transparent border-0">
+          <article class="card bg-transparent border border-secondary rounded">
             <div class="row g-0 align-items-center">
 
               @* Branch when there is an image: split into two columns *@
@@ -52,7 +50,7 @@
                       </h2>
 
                       <div class="mb-2 text-muted small">
-                        @post.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                        <span class="me-1">Posted:</span> @post.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
                         @if (!string.IsNullOrEmpty(post.AuthorName))
                         {
                             <span> • @post.AuthorName</span>
@@ -84,8 +82,8 @@
                           <a asp-page="/Blogs/Edit" asp-route-id="@post.Id" class="btn btn-sm btn-secondary me-1">Edit</a>
                           <a asp-page="/Blogs/Delete" asp-route-id="@post.Id" class="btn btn-sm btn-danger">Delete</a>
                       }
-                    </div> <!-- card-body -->
-                  </div> <!-- col-md-8 -->
+                    </div>
+                  </div>
               }
               else
               {
@@ -97,7 +95,7 @@
                       </h2>
 
                       <div class="mb-2 text-muted small">
-                        @post.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                        <span class="me-1">Posted:</span> @post.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
                         @if (!string.IsNullOrEmpty(post.AuthorName))
                         {
                             <span> • @post.AuthorName</span>
@@ -129,11 +127,11 @@
                           <a asp-page="/Blogs/Edit" asp-route-id="@post.Id" class="btn btn-sm btn-secondary me-1">Edit</a>
                           <a asp-page="/Blogs/Delete" asp-route-id="@post.Id" class="btn btn-sm btn-danger">Delete</a>
                       }
-                    </div> <!-- card-body -->
-                  </div> <!-- col-12 -->
+                    </div>
+                  </div> 
               }
 
-            </div> <!-- row -->
+            </div>
           </article>
         </div>
       }

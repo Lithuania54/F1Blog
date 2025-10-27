@@ -18,7 +18,6 @@ public class IndexModel : PageModel
 
     public void OnGet()
     {
-        // Load races from Data/races-2025.json if present
         var dataFile = Path.Combine(Directory.GetCurrentDirectory(), "src", "F1.Web", "Data", "races-2025.json");
         if (System.IO.File.Exists(dataFile))
         {
@@ -29,7 +28,6 @@ public class IndexModel : PageModel
             }
         }
 
-        // Detect track images in wwwroot/images2 or ContentRootPath/images2 by enumerating files.
     var webRoot = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
     var wwwImgDir = Path.Combine(webRoot, "images2");
     var repoImgDir = Path.Combine(_env.ContentRootPath, "images2");
@@ -54,9 +52,6 @@ public class IndexModel : PageModel
             names.AddRange(files);
         }
 
-        // Prefer numeric carousel images named 1.png .. 24.png in wwwroot/images2
-        // or src/F1.Web/images2 (dev convenience). This enforces the exact
-        // sequence requested by the user.
         for (int i = 1; i <= 24; i++)
         {
             var fileName = i + ".png";

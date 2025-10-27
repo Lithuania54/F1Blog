@@ -1,4 +1,3 @@
-// src/F1.Web/Pages/Rankings/Index.cshtml.cs
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.Logging;
 
 namespace F1.Web.Pages.Rankings
 {
-    // Lightweight DTOs used by the Rankings page.
     public class TeamStanding
     {
         public int Position { get; set; }
@@ -38,7 +36,6 @@ namespace F1.Web.Pages.Rankings
         {
             try
             {
-                // Try to load a JSON file shipped with the project under /Data/rankings-2025.json
                 var dataFile = Path.Combine(Directory.GetCurrentDirectory(), "Data", "rankings-2025.json");
 
                 if (System.IO.File.Exists(dataFile))
@@ -46,8 +43,6 @@ namespace F1.Web.Pages.Rankings
                     var json = await System.IO.File.ReadAllTextAsync(dataFile);
                     using var doc = JsonDocument.Parse(json);
                     var root = doc.RootElement;
-
-                    // flexible property names: "teams" or "teamStandings"
                     if (TryGetArray(root, out var teamsEl, "teams", "teamStandings"))
                     {
                         foreach (var el in teamsEl.EnumerateArray())
@@ -61,7 +56,6 @@ namespace F1.Web.Pages.Rankings
                         }
                     }
 
-                    // flexible property names: "drivers" or "driverStandings"
                     if (TryGetArray(root, out var driversEl, "drivers", "driverStandings"))
                     {
                         foreach (var el in driversEl.EnumerateArray())
@@ -77,7 +71,6 @@ namespace F1.Web.Pages.Rankings
                     }
                 }
 
-                // If file missing or lists are empty, populate sensible placeholders so the page renders.
                 if (TeamStandings.Count == 0)
                 {
                     TeamStandings = new List<TeamStanding>
@@ -101,11 +94,9 @@ namespace F1.Web.Pages.Rankings
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to load rankings JSON - falling back to sample data.");
-                // fallback sample data already set above will be used
             }
         }
 
-        // --- helper methods to parse JsonElement safely ---
         private static bool TryGetArray(JsonElement root, out JsonElement arrayElement, params string[] candidateNames)
         {
             arrayElement = default;

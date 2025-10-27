@@ -1,40 +1,72 @@
 @page
 @model F1.Web.Pages.Rankings.IndexModel
 @{
-  // Rankings placeholder page. Shows a prominent 'not seen' banner per
-  // project requirements. Replace this content when real ranking data is available.
   Layout = "~/Pages/Shared/_Layout.cshtml";
+  ViewData["Title"] = "2025 Rankings";
 }
 
-<div class="max-w-4xl mx-auto px-4 py-20">
-  <div class="bg-yellow-900/10 border-l-4 border-yellow-500 p-6 rounded text-center">
-    <h1 class="text-2xl font-bold">Rankings are not seen</h1>
-    <p class="mt-2 text-gray-300">Rankings are not visible yet — data unavailable / coming soon.</p>
-  </div>
+<div class="container py-5" style="min-height:70vh">
+  <h1 class="mb-4">2025 Rankings</h1>
 
-  <div class="mt-8 text-sm text-gray-400">
-    <!-- TODO: When rankings are available, expect a JSON structure like:
-         {
-           "DriverStandings": [{ "Position":1, "Name":"Driver", "Team":"Team", "Points":0, "Wins":0, "Podiums":0 }],
-           "TeamStandings": [{ "Position":1, "Name":"Team", "Points":0, "Wins":0, "Podiums":0 }]
-         }
-    -->
+  <div class="row g-4">
+    <div class="col-12 col-lg-5">
+      <div class="card bg-black text-light border-secondary h-100">
+        <div class="card-header border-secondary"><strong>Teams</strong></div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-dark table-striped table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="width:70px">Pos</th>
+                  <th>Team</th>
+                  <th class="text-end">Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach (var t in Model.TeamStandings)
+                {
+                  <tr>
+                    <td>@t.Position</td>
+                    <td>@t.Team</td>
+                    <td class="text-end">@t.Points</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-7">
+      <div class="card bg-black text-light border-secondary h-100">
+        <div class="card-header border-secondary"><strong>Drivers</strong></div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-dark table-striped table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="width:70px">Pos</th>
+                  <th>Driver</th>
+                  <th>Team</th>
+                  <th class="text-end">Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach (var d in Model.DriverStandings)
+                {
+                  <tr>
+                    <td>@d.Position</td>
+                    <td>@d.Driver</td>
+                    <td>@d.Team</td>
+                    <td class="text-end">@d.Points</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-
-@section Scripts {
-  <script>
-    // tiny client-side sort for columns with class 'sortable'
-    document.addEventListener('click', function(e){
-      const el = e.target;
-      if(el.classList && el.classList.contains('sortable')){
-        const th = el; const table = th.closest('table');
-        const colIndex = Array.from(th.parentElement.children).indexOf(th);
-        const tbody = table.querySelector('tbody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        rows.sort((a,b)=> +b.children[colIndex].innerText - +a.children[colIndex].innerText);
-        rows.forEach(r=>tbody.appendChild(r));
-      }
-    });
-  </script>
-}

@@ -25,10 +25,7 @@
       <span asp-validation-for="Post.Content" class="text-danger"></span>
     </div>
 
-    <div class="mb-3">
-      <label asp-for="Post.ImageUrl" class="form-label">Cover image URL</label>
-      <input asp-for="Post.ImageUrl" class="form-control" />
-    </div>
+    @* Image editing disabled per requirements *@
 
     <button type="submit" class="btn btn-primary">Save</button>
     <a asp-page="/Blogs/Index" class="btn btn-outline-light">Cancel</a>

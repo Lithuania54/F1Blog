@@ -17,7 +17,6 @@ namespace F1.Web.Pages.Blogs
 
         public async Task OnGetAsync()
         {
-            // load posts newest-first
             Posts = await _context.Posts
                 .AsNoTracking()
                 .OrderByDescending(p => p.CreatedAt)

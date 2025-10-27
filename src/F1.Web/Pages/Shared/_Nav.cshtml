@@ -54,10 +54,10 @@
         else
         {
             <li class="nav-item">
-              <a class="nav-link @(IsActivePrefix("/identity/account/login") ? "active" : "")" asp-area="Identity" asp-page="/Account/Login">Login</a>
+              <a class="nav-link @(IsActivePrefix("/auth/login") ? "active" : "")" asp-page="/Auth/Login">Login</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link @(IsActivePrefix("/identity/account/register") ? "active" : "")" asp-area="Identity" asp-page="/Account/Register">Register</a>
+              <a class="nav-link @(IsActivePrefix("/auth/register") ? "active" : "")" asp-page="/Auth/Register">Register</a>
             </li>
         }
       </ul>

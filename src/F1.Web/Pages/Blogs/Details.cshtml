@@ -6,11 +6,11 @@
 }
 
 <div class="container py-5">
-  <article class="mx-auto" style="max-width:900px;">
+  <article class="card bg-transparent border border-secondary rounded mx-auto p-4" style="max-width:900px;">
     <h1 class="display-6">@Model.Post?.Title</h1>
 
     <div class="text-muted mb-3">
-      @Model.Post?.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+      <span class="me-1">Posted:</span> @Model.Post?.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
       @if (!string.IsNullOrEmpty(Model.Post?.AuthorName)) { <span> • @Model.Post.AuthorName</span> }
     </div>
 

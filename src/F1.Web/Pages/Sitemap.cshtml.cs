@@ -18,7 +18,6 @@ public class SitemapModel : PageModel
         sb.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         sb.AppendLine("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
         sb.AppendLine($"<url><loc>{baseUrl}/</loc></url>");
-        // add posts
         var postsDir = Path.Combine(_env.ContentRootPath, "content", "posts");
         if (Directory.Exists(postsDir))
         {

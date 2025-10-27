@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using F1.Web.Data;
 using F1.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace F1.Web.Pages.Blogs
 {
+    [Authorize]
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -30,11 +32,17 @@ namespace F1.Web.Pages.Blogs
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Basic server-side validation
+            // Title is bound via Post.Title; ensure it's present
+            if (string.IsNullOrWhiteSpace(Post?.Title))
+                ModelState.AddModelError("Post.Title", "Title is required.");
+
+            // Content is collected from multiple blocks in the form
             if (string.IsNullOrWhiteSpace(Request.Form["ContentBlocks"]))
-            {
-                ModelState.AddModelError(string.Empty, "Content is required.");
-            }
+                ModelState.AddModelError("Post.Content", "Content is required.");
+
+            // Require uploader name
+            if (string.IsNullOrWhiteSpace(Post?.AuthorName))
+                ModelState.AddModelError("Post.AuthorName", "Your name is required.");
 
             if (!ModelState.IsValid)
             {
@@ -43,22 +51,18 @@ namespace F1.Web.Pages.Blogs
 
             try
             {
-                // Build content from posted blocks (matching your form names)
                 var contentBlocks = Request.Form["ContentBlocks"].Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
                 var content = string.Join("\n\n", contentBlocks);
 
-                // Build hashtags from three inputs named "HashtagInputs"
                 var hashtags = Request.Form["HashtagInputs"]
                     .Where(s => !string.IsNullOrWhiteSpace(s))
                     .Select(s => s.Trim())
                     .ToArray();
                 var hashtagsCsv = string.Join(',', hashtags);
 
-                // Fill Post fields
                 Post.Content = content;
                 Post.Hashtags = hashtagsCsv;
                 Post.CreatedAt = DateTime.UtcNow;
-                Post.AuthorName = User?.Identity?.Name ?? "Anonymous";
 
                 _context.Posts.Add(Post);
                 await _context.SaveChangesAsync();
