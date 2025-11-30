@@ -1,0 +1,73 @@
+@page
+@model F1.Web.Pages.Admin.TechDrops.IndexModel
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Tech Drops";
+}
+
+<section class="g-container g-section">
+  <div class="g-hero__shell g-hero__shell--compact">
+    <div class="g-hero__copy">
+      <div class="g-hero__eyebrow">Admin</div>
+      <h1 class="g-hero__title">Tech Drops</h1>
+      <p class="g-hero__text">Upload images, tag impact, and surface featured drops on the homepage/strategy pages.</p>
+    </div>
+    <div class="g-panel">
+      <form method="post">
+        <div class="mb-2">
+          <label class="form-label">Title</label>
+          <input class="form-control" asp-for="Input.Title" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Team</label>
+          <input class="form-control" asp-for="Input.TeamName" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Race weekend</label>
+          <input class="form-control" asp-for="Input.RaceWeekendName" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Summary</label>
+          <textarea class="form-control" asp-for="Input.Summary"></textarea>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Details</label>
+          <textarea class="form-control" asp-for="Input.Details"></textarea>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Image URL</label>
+          <input class="form-control" asp-for="Input.ImageUrl" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Impact tags</label>
+          <input class="form-control" asp-for="Input.ImpactTags" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Source link</label>
+          <input class="form-control" asp-for="Input.LinkUrl" />
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" asp-for="Input.IsFeatured" />
+          <label class="form-check-label" asp-for="Input.IsFeatured">Featured</label>
+        </div>
+        <button type="submit" class="g-btn g-btn-accent">Add tech drop</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="g-grid g-grid-cols-3">
+    @foreach (var drop in Model.Items)
+    {
+      <div class="g-card">
+        <div class="g-card__title">@drop.Title</div>
+        <div class="g-card__muted">@drop.TeamName @drop.RaceWeekendName</div>
+        <p class="g-card__muted">@drop.Summary</p>
+        @if (!string.IsNullOrWhiteSpace(drop.ImageUrl))
+        {
+          <div class="g-media__thumb" style="background-image:url('@drop.ImageUrl'); height:120px;"></div>
+        }
+        <div class="g-tag">@drop.ImpactTags</div>
+      </div>
+    }
+  </div>
+</section>

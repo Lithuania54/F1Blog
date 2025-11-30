@@ -13,6 +13,7 @@ public class IndexModel : PageModel
 
     public IReadOnlyList<StandingEntry> DriverStandings { get; private set; } = Array.Empty<StandingEntry>();
     public IReadOnlyList<StandingEntry> TeamStandings { get; private set; } = Array.Empty<StandingEntry>();
+    public NextRaceInfo NextRace { get; private set; } = new();
 
     public IndexModel(IF1DataService dataService)
     {
@@ -23,5 +24,6 @@ public class IndexModel : PageModel
     {
         DriverStandings = await _dataService.GetDriverStandingsAsync(cancellationToken);
         TeamStandings = await _dataService.GetConstructorStandingsAsync(cancellationToken);
+        NextRace = await _dataService.GetNextRaceAsync(cancellationToken);
     }
 }

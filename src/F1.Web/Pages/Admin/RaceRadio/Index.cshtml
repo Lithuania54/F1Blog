@@ -1,0 +1,61 @@
+@page
+@model F1.Web.Pages.Admin.RaceRadio.IndexModel
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Race Radio Bites";
+}
+
+<section class="g-container g-section">
+  <div class="g-hero__shell g-hero__shell--compact">
+    <div class="g-hero__copy">
+      <div class="g-hero__eyebrow">Admin</div>
+      <h1 class="g-hero__title">Race Radio Bites</h1>
+      <p class="g-hero__text">Curate official comms per weekend. Featured items surface on the homepage.</p>
+    </div>
+    <div class="g-panel">
+      <form method="post">
+        <div class="mb-2">
+          <label class="form-label">Title</label>
+          <input class="form-control" asp-for="Input.Title" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Race weekend</label>
+          <input class="form-control" asp-for="Input.RaceWeekendName" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Summary</label>
+          <textarea class="form-control" asp-for="Input.Summary"></textarea>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Source URL</label>
+          <input class="form-control" asp-for="Input.SourceUrl" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Clip URL</label>
+          <input class="form-control" asp-for="Input.ClipUrl" />
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" asp-for="Input.IsFeatured" />
+          <label class="form-check-label" asp-for="Input.IsFeatured">Featured</label>
+        </div>
+        <button type="submit" class="g-btn g-btn-accent">Add bite</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="g-grid g-grid-cols-3">
+    @foreach (var bite in Model.Items)
+    {
+      <div class="g-card">
+        <div class="g-card__title">@bite.Title</div>
+        <div class="g-card__muted">@bite.RaceWeekendName</div>
+        <p class="g-card__muted">@bite.Summary</p>
+        @if (!string.IsNullOrWhiteSpace(bite.SourceUrl))
+        {
+            <a class="g-link-muted" href="@bite.SourceUrl" target="_blank" rel="noopener">Source</a>
+        }
+        <div class="g-tag">@bite.PublishedAt.ToString("yyyy-MM-dd") @(bite.IsFeatured ? "• Featured" : "")</div>
+      </div>
+    }
+  </div>
+</section>

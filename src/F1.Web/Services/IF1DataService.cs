@@ -9,4 +9,5 @@ public interface IF1DataService
 {
     Task<IReadOnlyList<StandingEntry>> GetDriverStandingsAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<StandingEntry>> GetConstructorStandingsAsync(CancellationToken cancellationToken = default);
+    Task<NextRaceInfo> GetNextRaceAsync(CancellationToken cancellationToken = default);
 }

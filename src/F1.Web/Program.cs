@@ -55,6 +55,7 @@ builder.Services.AddSingleton<MarkdownService>();
 builder.Services.AddSingleton<NewsletterService>();
 builder.Services.AddSingleton<ContactService>();
 builder.Services.AddHttpClient<IF1DataService, F1DataService>();
+builder.Services.AddScoped<IContentSpotlightService, ContentSpotlightService>();
 
 var app = builder.Build();
 

@@ -21,6 +21,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Badge> Badges => Set<Badge>();
     public DbSet<UserBadge> UserBadges => Set<UserBadge>();
+    public DbSet<RaceRadioBite> RaceRadioBites => Set<RaceRadioBite>();
+    public DbSet<TechDrop> TechDrops => Set<TechDrop>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

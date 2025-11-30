@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using F1.Web.Models;
+using F1.Web.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
@@ -21,7 +25,12 @@ namespace F1.Web.Pages
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public void OnGet()
+        public async Task OnGetAsync(CancellationToken cancellationToken)
+        {
+            await LoadCarouselAsync();
+        }
+
+        private async Task LoadCarouselAsync()
         {
             try
             {
@@ -40,7 +49,6 @@ namespace F1.Web.Pages
 
                 for (int i = 1; i <= 10; i++)
                 {
-                    bool foundForIndex = false;
                     foreach (var ext in preferredExts)
                     {
                         var fileName = $"{i}{ext}";
@@ -51,7 +59,6 @@ namespace F1.Web.Pages
                             if (System.IO.File.Exists(physicalWww))
                             {
                                 CarouselImageUrls.Add($"/images/{fileName}");
-                                foundForIndex = true;
                                 break;
                             }
                         }
@@ -62,12 +69,10 @@ namespace F1.Web.Pages
                             if (System.IO.File.Exists(physicalRepo))
                             {
                                 CarouselImageUrls.Add($"/images/{fileName}");
-                                foundForIndex = true;
                                 break;
                             }
                         }
                     }
-                    // continue to next index if nothing found for this number
                 }
 
                 if (CarouselImageUrls.Count == 0)

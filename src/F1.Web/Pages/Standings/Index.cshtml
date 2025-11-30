@@ -10,11 +10,17 @@
     <div class="g-hero__copy">
       <div class="g-hero__eyebrow">Leaderboards</div>
       <h1 class="g-hero__title">Who’s leading the fight in 2025</h1>
-      <p class="g-hero__text">Top performers up front, full tables below. Updated when the data source refreshes.</p>
+      <p class="g-hero__text">Official standings pulled from formula1.com.</p>
     </div>
     <div class="g-panel">
-      <div class="g-card__title mb-1">Data source</div>
-      <div class="g-card__muted">Served via <code>IF1DataService</code> (cached). Swap in live F1 source when ready.</div>
+      <div class="g-card__title mb-1">Next race</div>
+      <div class="g-card__muted">@Model.NextRace.Name (@Model.NextRace.Country)</div>
+      <div class="g-tag">@Model.NextRace.LocalStartDisplay</div>
+      <div class="g-countdown" data-start="@Model.NextRace.StartTimeUtc.ToUniversalTime().ToString("o")">
+        <span class="g-count g-days">--</span>d
+        <span class="g-count g-hours">--</span>h
+        <span class="g-count g-mins">--</span>m
+      </div>
     </div>
   </div>
 
@@ -48,8 +54,6 @@
               <th scope="col">Driver</th>
               <th scope="col">Team</th>
               <th scope="col">Points</th>
-              <th scope="col">Wins</th>
-              <th scope="col">Podiums</th>
             </tr>
           </thead>
           <tbody>
@@ -60,8 +64,6 @@
                 <td>@d.Name</td>
                 <td>@d.Team</td>
                 <td>@d.Points</td>
-                <td>@d.Wins</td>
-                <td>@d.Podiums</td>
               </tr>
             }
           </tbody>
@@ -97,8 +99,6 @@
               <th scope="col">Pos</th>
               <th scope="col">Team</th>
               <th scope="col">Points</th>
-              <th scope="col">Wins</th>
-              <th scope="col">Podiums</th>
             </tr>
           </thead>
           <tbody>
@@ -108,8 +108,6 @@
                 <td>@t.Position</td>
                 <td>@t.Name</td>
                 <td>@t.Points</td>
-                <td>@t.Wins</td>
-                <td>@t.Podiums</td>
               </tr>
             }
           </tbody>
@@ -118,3 +116,29 @@
     </div>
   </div>
 </section>
+
+@section Scripts {
+  <script>
+    (function(){
+      const el = document.querySelector('.g-countdown');
+      if(!el) return;
+      const start = new Date(el.dataset.start);
+      const daysEl = el.querySelector('.g-days');
+      const hoursEl = el.querySelector('.g-hours');
+      const minsEl = el.querySelector('.g-mins');
+      const tick = () => {
+        const now = new Date();
+        let diff = Math.max(0, start - now);
+        const days = Math.floor(diff / (1000*60*60*24));
+        diff -= days*1000*60*60*24;
+        const hours = Math.floor(diff / (1000*60*60));
+        diff -= hours*1000*60*60;
+        const mins = Math.floor(diff / (1000*60));
+        daysEl.textContent = days.toString().padStart(2,'0');
+        hoursEl.textContent = hours.toString().padStart(2,'0');
+        minsEl.textContent = mins.toString().padStart(2,'0');
+      };
+      tick(); setInterval(tick, 60000);
+    })();
+  </script>
+}

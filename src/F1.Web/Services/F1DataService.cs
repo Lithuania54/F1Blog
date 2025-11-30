@@ -29,6 +29,45 @@ public class F1DataService : IF1DataService
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private const string DriverCacheKey = "f1:drivers";
     private const string TeamCacheKey = "f1:teams";
+    private const string NextRaceCacheKey = "f1:nextrace";
+
+    private static readonly Dictionary<string, string> DriverImages = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "Max Verstappen", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/max-verstappen/red-bull-racing.png" },
+        { "Sergio Perez", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/sergio-perez/red-bull-racing.png" },
+        { "Charles Leclerc", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/charles-leclerc/ferrari.png" },
+        { "Carlos Sainz", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/carlos-sainz/ferrari.png" },
+        { "Lando Norris", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/lando-norris/mclaren.png" },
+        { "Oscar Piastri", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/oscar-piastri/mclaren.png" },
+        { "George Russell", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/george-russell/mercedes.png" },
+        { "Lewis Hamilton", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/lewis-hamilton/mercedes.png" },
+        { "Fernando Alonso", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/fernando-alonso/aston-martin.png" },
+        { "Lance Stroll", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/lance-stroll/aston-martin.png" },
+        { "Daniel Ricciardo", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/daniel-ricciardo/rb.png" },
+        { "Yuki Tsunoda", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/yuki-tsunoda/rb.png" },
+        { "Nico Hulkenberg", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/nico-hulkenberg/haas.png" },
+        { "Kevin Magnussen", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/kevin-magnussen/haas.png" },
+        { "Alexander Albon", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/alexander-albon/williams.png" },
+        { "Logan Sargeant", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/logan-sargeant/williams.png" },
+        { "Valtteri Bottas", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/valtteri-bottas/kick-sauber.png" },
+        { "Zhou Guanyu", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/zhou-guanyu/kick-sauber.png" },
+        { "Pierre Gasly", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/pierre-gasly/alpine.png" },
+        { "Esteban Ocon", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/esteban-ocon/alpine.png" }
+    };
+
+    private static readonly Dictionary<string, string> TeamImages = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { "Red Bull Racing", "https://media.formula1.com/content/dam/fom-website/teams/2024/red-bull-racing.png" },
+        { "Ferrari", "https://media.formula1.com/content/dam/fom-website/teams/2024/ferrari.png" },
+        { "McLaren", "https://media.formula1.com/content/dam/fom-website/teams/2024/mclaren.png" },
+        { "Mercedes", "https://media.formula1.com/content/dam/fom-website/teams/2024/mercedes.png" },
+        { "Aston Martin", "https://media.formula1.com/content/dam/fom-website/teams/2024/aston-martin.png" },
+        { "Alpine", "https://media.formula1.com/content/dam/fom-website/teams/2024/alpine.png" },
+        { "RB", "https://media.formula1.com/content/dam/fom-website/teams/2024/alphatauri.png" },
+        { "Haas", "https://media.formula1.com/content/dam/fom-website/teams/2024/haas-f1-team.png" },
+        { "Williams", "https://media.formula1.com/content/dam/fom-website/teams/2024/williams.png" },
+        { "Sauber", "https://media.formula1.com/content/dam/fom-website/teams/2024/kick-sauber.png" }
+    };
 
     public F1DataService(HttpClient httpClient, IWebHostEnvironment env, IMemoryCache cache, ILogger<F1DataService> logger)
     {
@@ -60,6 +99,16 @@ public class F1DataService : IF1DataService
                    ?? GetSampleTeams();
         _cache.Set(TeamCacheKey, data, TimeSpan.FromMinutes(15));
         return data;
+    }
+
+    public async Task<NextRaceInfo> GetNextRaceAsync(CancellationToken cancellationToken = default)
+    {
+        if (_cache.TryGetValue(NextRaceCacheKey, out NextRaceInfo? cached) && cached != null)
+            return cached;
+
+        var info = await LoadNextRaceFromOfficialSiteAsync(cancellationToken) ?? GetSampleNextRace();
+        _cache.Set(NextRaceCacheKey, info, TimeSpan.FromMinutes(30));
+        return info;
     }
 
     /// <summary>
@@ -102,7 +151,7 @@ public class F1DataService : IF1DataService
                     var name = Clean(cells[1].InnerText);
                     var team = Clean(cells[2].InnerText);
                     var points = SafeInt(cells.Last().InnerText);
-                    var imageUrl = BuildOfficialImageUrl(name, isDriver: true);
+                    var imageUrl = BuildOfficialImageUrl(name, team, isDriver: true);
                     entries.Add(new StandingEntry
                     {
                         Position = pos,
@@ -119,7 +168,7 @@ public class F1DataService : IF1DataService
                 {
                     var name = Clean(cells[1].InnerText);
                     var points = SafeInt(cells.Last().InnerText);
-                    var imageUrl = BuildOfficialImageUrl(name, isDriver: false);
+                    var imageUrl = BuildOfficialImageUrl(name, string.Empty, isDriver: false);
                     entries.Add(new StandingEntry
                     {
                         Position = pos,
@@ -253,6 +302,68 @@ public class F1DataService : IF1DataService
         return $"https://dummyimage.com/320x320/{bg}/1f1a17.jpg&text={label}";
     }
 
+    private async Task<NextRaceInfo?> LoadNextRaceFromOfficialSiteAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var year = DateTime.UtcNow.Year;
+            var url = $"https://www.formula1.com/en/racing/{year}.html";
+            using var req = new HttpRequestMessage(HttpMethod.Get, url);
+            req.Headers.UserAgent.ParseAdd("Mozilla/5.0 (compatible; F1DataService/1.0)");
+            var response = await _httpClient.SendAsync(req, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            var doc = new HtmlDocument();
+            doc.Load(stream);
+
+            // Heuristic: first event card that is not completed
+            var eventNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class,'event-item') and contains(@class,'upcoming')]");
+            if (eventNode == null)
+            {
+                // alternative selector
+                var nodes = doc.DocumentNode.SelectNodes("//a[contains(@class,'event-item')]");
+                eventNode = nodes?.FirstOrDefault(x => x.InnerText.Contains("Round", StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (eventNode == null)
+                return null;
+
+            string name = Clean(eventNode.SelectSingleNode(".//div[contains(@class,'event-title')]")?.InnerText ?? "Next Grand Prix");
+            string country = Clean(eventNode.SelectSingleNode(".//div[contains(@class,'event-country')]")?.InnerText ?? string.Empty);
+            string when = Clean(eventNode.SelectSingleNode(".//div[contains(@class,'event-dates')]")?.InnerText ?? string.Empty);
+
+            DateTimeOffset start = DateTimeOffset.UtcNow.AddDays(7);
+            if (DateTimeOffset.TryParse(when, out var parsed))
+                start = parsed;
+
+            return new NextRaceInfo
+            {
+                Name = name,
+                Country = country,
+                StartTimeUtc = start,
+                Circuit = string.Empty,
+                LocalStartDisplay = when,
+                TrackMapUrl = string.Empty
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to scrape next race info.");
+            return null;
+        }
+    }
+
+    private static NextRaceInfo GetSampleNextRace() => new()
+    {
+        Name = "Australian Grand Prix",
+        Country = "Australia",
+        StartTimeUtc = DateTimeOffset.UtcNow.AddDays(12).AddHours(5),
+        Circuit = "Albert Park",
+        LocalStartDisplay = "Sun 15:00 local",
+        TrackMapUrl = ""
+    };
+
     private static string Clean(string input)
     {
         return HtmlEntity.DeEntitize(input).Replace("\n", " ").Replace("\r", " ").Trim();
@@ -263,12 +374,14 @@ public class F1DataService : IF1DataService
         return int.TryParse(input.Trim(), out var val) ? val : 0;
     }
 
-    private static string BuildOfficialImageUrl(string name, bool isDriver)
+    private static string BuildOfficialImageUrl(string name, string team, bool isDriver)
     {
-        // Best-effort: return official F1 logo for teams; driver placeholder otherwise.
-        if (!isDriver)
-            return "https://media.formula1.com/content/dam/fom-website/teams/2024/fia-f1-logo.png";
-
-        return BuildPlaceholder(isDriver: true, name);
+        if (isDriver && DriverImages.TryGetValue(name, out var driverUrl))
+            return driverUrl;
+        if (!isDriver && TeamImages.TryGetValue(name, out var teamUrl))
+            return teamUrl;
+        if (isDriver && !string.IsNullOrWhiteSpace(team) && TeamImages.TryGetValue(team, out var teamBadge))
+            return teamBadge;
+        return BuildPlaceholder(isDriver: isDriver, name);
     }
 }
