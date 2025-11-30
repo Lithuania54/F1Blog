@@ -181,7 +181,7 @@ a:hover {
 }
 
 .g-hero {
-  padding: 64px 0 32px;
+  padding: 12px 0 32px;
 }
 
 .g-hero__shell {
@@ -631,6 +631,10 @@ select:focus-visible {
 
   .g-main {
     padding-top: 120px;
+  }
+
+  .g-hero {
+    padding-top: 12px;
   }
 }
 

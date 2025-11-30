@@ -85,7 +85,7 @@ public class F1DataService : IF1DataService
         var data = await LoadFromOfficialSiteAsync(isDriver: true, cancellationToken)
                    ?? await LoadFromLocalAsync(isDriver: true, cancellationToken)
                    ?? GetSampleDrivers();
-        _cache.Set(DriverCacheKey, data, TimeSpan.FromMinutes(15));
+        _cache.Set(DriverCacheKey, data, TimeSpan.FromMinutes(5));
         return data;
     }
 
@@ -97,7 +97,7 @@ public class F1DataService : IF1DataService
         var data = await LoadFromOfficialSiteAsync(isDriver: false, cancellationToken)
                    ?? await LoadFromLocalAsync(isDriver: false, cancellationToken)
                    ?? GetSampleTeams();
-        _cache.Set(TeamCacheKey, data, TimeSpan.FromMinutes(15));
+        _cache.Set(TeamCacheKey, data, TimeSpan.FromMinutes(5));
         return data;
     }
 
@@ -107,8 +107,16 @@ public class F1DataService : IF1DataService
             return cached;
 
         var info = await LoadNextRaceFromOfficialSiteAsync(cancellationToken) ?? GetSampleNextRace();
-        _cache.Set(NextRaceCacheKey, info, TimeSpan.FromMinutes(30));
+        _cache.Set(NextRaceCacheKey, info, TimeSpan.FromMinutes(10));
         return info;
+    }
+
+    public async Task RefreshStandingsAsync(CancellationToken cancellationToken = default)
+    {
+        _cache.Remove(DriverCacheKey);
+        _cache.Remove(TeamCacheKey);
+        await GetDriverStandingsAsync(cancellationToken);
+        await GetConstructorStandingsAsync(cancellationToken);
     }
 
     /// <summary>

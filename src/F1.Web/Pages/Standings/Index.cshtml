@@ -34,7 +34,6 @@
         @foreach (var d in Model.DriverStandings.Take(3))
         {
           <article class="lb-card">
-            <div class="lb-chip">P@d.Position</div>
             <div class="lb-card__body">
               <div class="lb-img" style="background-image:url('@d.ImageUrl');"></div>
               <div>
@@ -80,7 +79,6 @@
         @foreach (var t in Model.TeamStandings.Take(3))
         {
           <article class="lb-card">
-            <div class="lb-chip">P@t.Position</div>
             <div class="lb-card__body">
               <div class="lb-img lb-img--team" style="background-image:url('@t.ImageUrl');"></div>
               <div>

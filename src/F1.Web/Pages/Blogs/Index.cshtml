@@ -19,11 +19,11 @@
     <div class="card bg-transparent border-1 border-secondary p-4 text-center">
       @if (User?.Identity?.IsAuthenticated == true)
       {
-        <a asp-page="/Blogs/Create" class="btn btn-outline-light">Create first blog</a>
+        <a asp-page="/Blogs/Create" class="btn btn-primary">Create first blog</a>
       }
       else
       {
-        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-light">Login to write</a>
+        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary">Login to write</a>
       }
     </div>
   }

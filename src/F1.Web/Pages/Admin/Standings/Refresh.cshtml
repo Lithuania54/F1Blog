@@ -1,0 +1,25 @@
+@page
+@model F1.Web.Pages.Admin.Standings.RefreshModel
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Refresh Standings";
+}
+
+<section class="g-container g-section">
+  <div class="g-hero__shell g-hero__shell--compact">
+    <div class="g-hero__copy">
+      <div class="g-hero__eyebrow">Admin</div>
+      <h1 class="g-hero__title">Refresh Standings</h1>
+      <p class="g-hero__text">Clears cache and re-scrapes the official Formula 1 results pages.</p>
+    </div>
+    <div class="g-panel">
+      <form method="post">
+        <button type="submit" class="g-btn g-btn-accent">Refresh now</button>
+      </form>
+      @if (Model.LastRun != null)
+      {
+        <div class="g-card__muted mt-2">Last refresh: @Model.LastRun</div>
+      }
+    </div>
+  </div>
+</section>
