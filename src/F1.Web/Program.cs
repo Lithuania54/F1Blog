@@ -12,6 +12,7 @@ using Microsoft.Extensions.FileProviders;
 using Serilog;
 using F1.Web.Services;
 using F1.Web.Data;
+using F1.Web.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +37,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // helpful developer page for EF errors
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
 })
