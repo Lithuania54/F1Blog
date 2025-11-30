@@ -2,70 +2,119 @@
 @model F1.Web.Pages.Standings.IndexModel
 @{
     Layout = "~/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Standings";
 }
 
-<div class="container py-5 mt-5">
-
-  <h2 class="h4">Driver Standings (2025)</h2>
-  <div class="table-responsive mb-4">
-    <table class="table table-dark table-striped table-borderless">
-      <thead>
-        <tr>
-          <th scope="col">Pos</th>
-          <th scope="col">Driver</th>
-          <th scope="col">Team</th>
-          <th scope="col" class="sortable">Points</th>
-        </tr>
-      </thead>
-      <tbody id="driversBody">
-        @foreach(var d in Model.DriverStandings)
-        {
-          <tr class="@(d.Position==1?"leader-row":"")">
-            <td>@d.Position</td>
-            <td>@d.Name</td>
-            <td>@d.Team</td>
-            <td>@d.Points</td>
-          </tr>
-        }
-      </tbody>
-    </table>
+<section class="g-container g-section">
+  <div class="g-hero__shell g-hero__shell--compact">
+    <div class="g-hero__copy">
+      <div class="g-hero__eyebrow">Leaderboards</div>
+      <h1 class="g-hero__title">Who’s leading the fight in 2025</h1>
+      <p class="g-hero__text">Top performers up front, full tables below. Updated when the data source refreshes.</p>
+    </div>
+    <div class="g-panel">
+      <div class="g-card__title mb-1">Data source</div>
+      <div class="g-card__muted">Served via <code>IF1DataService</code> (cached). Swap in live F1 source when ready.</div>
+    </div>
   </div>
 
-  <h2 class="h4 mt-5">Team Standings (2025)</h2>
-  <div class="table-responsive">
-    <table class="table table-dark table-striped">
-      <thead>
-        <tr>
-          <th>Pos</th><th>Team</th><th class="sortable">Points</th>
-        </tr>
-      </thead>
-      <tbody id="teamsBody">
-        @foreach(var t in Model.TeamStandings)
+  <div class="lb-wrap">
+    <div class="lb-group">
+      <div class="lb-header">
+        <h2>Drivers</h2>
+        <span class="g-card__muted">Top 3 highlight + full table</span>
+      </div>
+      <div class="lb-top3">
+        @foreach (var d in Model.DriverStandings.Take(3))
         {
-          <tr class="@(t.Position==1?"leader-row":"")">
-            <td>@t.Position</td>
-            <td>@t.Name</td>
-            <td>@t.Points</td>
-          </tr>
+          <article class="lb-card">
+            <div class="lb-chip">P@d.Position</div>
+            <div class="lb-card__body">
+              <div class="lb-img" style="background-image:url('@d.ImageUrl');"></div>
+              <div>
+                <div class="lb-name">@d.Name</div>
+                <div class="lb-meta">@d.Team</div>
+                <div class="lb-points">@d.Points pts</div>
+              </div>
+            </div>
+          </article>
         }
-      </tbody>
-    </table>
-  </div>
-</div>
+      </div>
+      <div class="table-responsive">
+        <table class="g-table">
+          <thead>
+            <tr>
+              <th scope="col">Pos</th>
+              <th scope="col">Driver</th>
+              <th scope="col">Team</th>
+              <th scope="col">Points</th>
+              <th scope="col">Wins</th>
+              <th scope="col">Podiums</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach(var d in Model.DriverStandings)
+            {
+              <tr>
+                <td>@d.Position</td>
+                <td>@d.Name</td>
+                <td>@d.Team</td>
+                <td>@d.Points</td>
+                <td>@d.Wins</td>
+                <td>@d.Podiums</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-@section Scripts{
-  <script defer>
-    // Simple client-side sort for columns with class 'sortable'
-    document.addEventListener('click', function(e){
-      const el = e.target;
-      if(el.classList && el.classList.contains('sortable')){
-        const th = el; const table = th.closest('table');
-        const colIndex = Array.from(th.parentElement.children).indexOf(th);
-        const tbody = table.querySelector('tbody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        rows.sort((a,b)=> +b.children[colIndex].innerText - +a.children[colIndex].innerText);
-        rows.forEach(r=>tbody.appendChild(r));
-      }
-    });
-  </script>
-}
+    <div class="lb-group">
+      <div class="lb-header">
+        <h2>Teams</h2>
+        <span class="g-card__muted">Top 3 highlight + full table</span>
+      </div>
+      <div class="lb-top3">
+        @foreach (var t in Model.TeamStandings.Take(3))
+        {
+          <article class="lb-card">
+            <div class="lb-chip">P@t.Position</div>
+            <div class="lb-card__body">
+              <div class="lb-img lb-img--team" style="background-image:url('@t.ImageUrl');"></div>
+              <div>
+                <div class="lb-name">@t.Name</div>
+                <div class="lb-meta">Constructor</div>
+                <div class="lb-points">@t.Points pts</div>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+      <div class="table-responsive">
+        <table class="g-table">
+          <thead>
+            <tr>
+              <th scope="col">Pos</th>
+              <th scope="col">Team</th>
+              <th scope="col">Points</th>
+              <th scope="col">Wins</th>
+              <th scope="col">Podiums</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach(var t in Model.TeamStandings)
+            {
+              <tr>
+                <td>@t.Position</td>
+                <td>@t.Name</td>
+                <td>@t.Points</td>
+                <td>@t.Wins</td>
+                <td>@t.Podiums</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

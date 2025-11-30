@@ -5,63 +5,42 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    // Normalized path (lowercase, no trailing slash)
     var path = HttpContextAccessor?.HttpContext?.Request?.Path.Value?.TrimEnd('/')?.ToLowerInvariant() ?? "/";
     bool IsActivePrefix(string p) => path.StartsWith(p.TrimEnd('/').ToLowerInvariant());
+    var userInitial = User?.Identity?.Name?.FirstOrDefault();
 }
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" role="navigation" aria-label="Main navigation">
-  <div class="container-fluid">
-    <a class="navbar-brand fw-bold" asp-page="/Index">Drive the Story</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-            aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+<header class="g-nav" role="banner">
+  <div class="g-nav__inner">
+    <div class="g-nav__brand">
+      <a asp-page="/Index" class="g-logo">F1 Garage</a>
+    </div>
 
-    <div class="collapse navbar-collapse" id="mainNav">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link @(IsActivePrefix("/races") ? "active" : "")" asp-page="/Races/Index">Races</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link @(IsActivePrefix("/standings") ? "active" : "")" asp-page="/Standings/Index">Standings</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link @(IsActivePrefix("/blogs") ? "active" : "")" asp-page="/Blogs/Index">Blogs</a>
-        </li>
+    <input type="checkbox" id="nav-toggle" class="g-nav__toggle" aria-label="Toggle navigation" />
+    <label for="nav-toggle" class="g-nav__burger" aria-controls="mainNav" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </label>
 
-        @if (SignInManager.IsSignedIn(User))
-        {
-            <li class="nav-item">
-              <a class="nav-link @(IsActivePrefix("/blogs/create") ? "active" : "")" asp-page="/Blogs/Create">Write Blog</a>
-            </li>
+    <nav id="mainNav" class="g-nav__links" aria-label="Main navigation">
+      <a class="g-nav__link @(IsActivePrefix("/races") ? "is-active" : "")" asp-page="/Races/Index">Race Weekends</a>
+      <a class="g-nav__link @(IsActivePrefix("/standings") ? "is-active" : "")" asp-page="/Standings/Index">Standings</a>
+      <a class="g-nav__link @(IsActivePrefix("/blogs") ? "is-active" : "")" asp-page="/Blogs/Index">Blog</a>
+    </nav>
 
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                @User.Identity?.Name
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                <li>
-                  <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Profile</a>
-                </li>
-                <li>
-                  <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
-                    <button type="submit" class="dropdown-item">Logout</button>
-                  </form>
-                </li>
-              </ul>
-            </li>
-        }
-        else
-        {
-            <li class="nav-item">
-              <a class="nav-link @(IsActivePrefix("/auth/login") ? "active" : "")" asp-page="/Auth/Login">Login</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link @(IsActivePrefix("/auth/register") ? "active" : "")" asp-page="/Auth/Register">Register</a>
-            </li>
-        }
-      </ul>
+    <div class="g-nav__actions">
+      @if (SignInManager.IsSignedIn(User))
+      {
+          <a class="g-link-muted" asp-page="/Blogs/Create">Write</a>
+          <div class="g-avatar">@((userInitial.HasValue && !char.IsControl(userInitial.Value)) ? userInitial.Value.ToString().ToUpper() : "F")</div>
+          <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+            <button type="submit" class="g-btn g-btn-ghost">Logout</button>
+          </form>
+      }
+      else
+      {
+          <a class="g-link-muted @(IsActivePrefix("/auth/login") ? "is-active" : "")" asp-page="/Auth/Login">Log in</a>
+          <a class="g-btn g-btn-accent" asp-page="/Auth/Register">Create account</a>
+      }
     </div>
   </div>
-</nav>
+</header>

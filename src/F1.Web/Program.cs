@@ -48,11 +48,13 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 // --------------------
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor(); // Needed for _Nav.cshtml
+builder.Services.AddMemoryCache();
 
 // Application Services
 builder.Services.AddSingleton<MarkdownService>();
 builder.Services.AddSingleton<NewsletterService>();
 builder.Services.AddSingleton<ContactService>();
+builder.Services.AddHttpClient<IF1DataService, F1DataService>();
 
 var app = builder.Build();
 

@@ -5,34 +5,82 @@
     ViewData["Title"] = "Home";
 }
 
-<main class="home-container text-center">
+<section class="g-hero">
+  <div class="g-hero__shell">
+    <div class="g-hero__copy">
+      <div class="g-hero__eyebrow">Season hub</div>
+      <h1 class="g-hero__title">All the pace, strategy, and stories from every F1 weekend.</h1>
+      <p class="g-hero__text">
+        Follow race schedules, standings, strategy breakdowns, and long-form posts in one cohesive, premium experience.
+      </p>
+      <div class="g-pill-row">
+        <span class="g-pill">Race weekends</span>
+        <span class="g-pill">Strategy &amp; tech</span>
+        <span class="g-pill">Predictions</span>
+      </div>
+      <div class="g-cta-row">
+        <a class="g-btn g-btn-accent" asp-page="/Blogs/Index">Read the blog</a>
+        <a class="g-btn g-btn-ghost" asp-page="/Standings/Index">View standings</a>
+      </div>
+    </div>
 
-    <section class="hero-title-section mt-4 mb-4">
-        <h1 class="display-5 fw-bold text-light">Everything about F1</h1>
-    </section>
-
-    @if (Model.CarouselImageUrls.Any())
-    {
-        <div id="f1Swiper" class="swiper hero-swiper" data-images='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CarouselImageUrls))'>
-            <div class="swiper-wrapper">
-                @for (int i = 0; i < Model.CarouselImageUrls.Count; i++)
-                {
-                    var url = Model.CarouselImageUrls[i];
-                    <div class="swiper-slide">
-                        <img src="@url" alt="F1 car #@(i + 1)" class="carousel-img" />
-                    </div>
-                }
-            </div>
-
-            <div class="swiper-pagination"></div>
-            <div class="swiper-button-prev"></div>
-            <div class="swiper-button-next"></div>
+    <div class="g-carousel-shell">
+      @if (Model.CarouselImageUrls.Any())
+      {
+        <div id="f1Swiper" class="swiper g-carousel" data-images='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CarouselImageUrls))'>
+          <div class="swiper-wrapper">
+            @for (int i = 0; i < Model.CarouselImageUrls.Count; i++)
+            {
+              var url = Model.CarouselImageUrls[i];
+              <div class="swiper-slide">
+                <img src="@url" alt="F1 car #@(i + 1)" />
+              </div>
+            }
+          </div>
+          <div class="swiper-pagination"></div>
+          <div class="swiper-button-prev" aria-label="Previous slide"></div>
+          <div class="swiper-button-next" aria-label="Next slide"></div>
         </div>
-    }
-    else
-    {
-        <p class="text-secondary mt-4">@Model.CarouselNotFoundMessage</p>
-    }
+      }
+      else
+      {
+        <div class="g-panel g-text-muted">@Model.CarouselNotFoundMessage</div>
+      }
+    </div>
+  </div>
+</section>
 
-</main>
+<section class="g-section">
+  <div class="g-container g-grid g-grid-cols-3">
+    <div class="g-card">
+      <div class="g-card__title">Next race weekend</div>
+      <div class="g-card__muted">Live timings, local start times, tyres, weather, and track map in one place.</div>
+    </div>
+    <div class="g-card">
+      <div class="g-card__title">Strategy &amp; tech</div>
+      <div class="g-card__muted">Tyre deg charts, pit stop deltas, upgrade tracker, and aero notes.</div>
+    </div>
+    <div class="g-card">
+      <div class="g-card__title">Community picks</div>
+      <div class="g-card__muted">Predictions game with leaderboards and badges for the most consistent fans.</div>
+    </div>
+  </div>
+</section>
+
+<section class="g-section">
+  <div class="g-container g-grid g-grid-cols-3">
+    <div class="g-panel">
+      <div class="g-card__title">Race radio bites</div>
+      <div class="g-card__muted">Embed short clips or summaries from official comms per weekend (admin can curate links).</div>
+    </div>
+    <div class="g-panel">
+      <div class="g-card__title">Tech drop of the week</div>
+      <div class="g-card__muted">Highlight a single aero or mechanical tweak with a diagram or image and a concise impact note.</div>
+    </div>
+    <div class="g-panel">
+      <div class="g-card__title">Badge spotlight</div>
+      <div class="g-card__muted">Showcase a badge and who earned it recently (driven by comments/predictions volume).</div>
+    </div>
+  </div>
+</section>
 
