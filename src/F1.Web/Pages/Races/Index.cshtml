@@ -18,7 +18,7 @@
             <img src="@img" alt="Track @i" loading="lazy" />
             <div class="position-absolute bottom-0 start-0 p-3 text-white">
               <h5 class="mb-1">@((race!=null)?race.Name:"Upcoming Race")</h5>
-              <div class="small">@((race!=null)?race.Location:"Location") — @((race!=null)?race.Date.ToString("yyyy-MM-dd"):"")</div>
+              <div class="small">@((race!=null)?race.Location:"Location") - @((race!=null)?race.Date.ToString("yyyy-MM-dd"):"")</div>
               <div class="mt-2"><a class="btn btn-sm btn-outline-light" href="#">View details (coming soon)</a></div>
             </div>
           </div>

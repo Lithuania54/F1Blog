@@ -5,144 +5,98 @@
     ViewData["Title"] = "Blogs";
 }
 
-<div class="container py-5">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">Blogs</h1>
-    @if (User?.Identity?.IsAuthenticated == true)
-    {
-        <a asp-page="/Blogs/Create" class="btn btn-primary">Write Blog</a>
-    }
+<section class="g-container g-section blog-list">
+  <div class="blog-list__header">
+    <div>
+      <div class="g-hero__eyebrow">Editorial</div>
+      <h1 class="blog-list__title">Garage stories</h1>
+      <p class="g-hero__text mb-0">Deep dives, weekend debriefs, and fan perspectives tailored for every Grand Prix.</p>
+    </div>
+    <div class="blog-list__actions">
+      @if (User?.Identity?.IsAuthenticated == true)
+      {
+          <a asp-page="/Blogs/Create" class="g-btn g-btn-accent">Write a blog</a>
+      }
+      else
+      {
+          <a asp-page="/Auth/Login" class="g-btn g-btn-ghost">Log in to write</a>
+      }
+    </div>
   </div>
 
   @if (Model.Posts == null || !Model.Posts.Any())
   {
-    <div class="card bg-transparent border-1 border-secondary p-4 text-center">
+    <div class="g-card text-center">
+      <div class="g-card__title">No posts yet</div>
+      <p class="g-card__muted mb-3">Be the first to share a race breakdown or opinion piece.</p>
       @if (User?.Identity?.IsAuthenticated == true)
       {
-        <a asp-page="/Blogs/Create" class="btn btn-primary">Create first blog</a>
+        <a asp-page="/Blogs/Create" class="g-btn g-btn-accent">Create first blog</a>
       }
       else
       {
-        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary">Login to write</a>
+        <a asp-page="/Auth/Login" class="g-btn g-btn-ghost">Log in to write</a>
       }
     </div>
   }
   else
   {
-    <div class="row gy-4">
+    <div class="blog-grid">
       @foreach (var post in Model.Posts)
       {
-        <div class="col-12">
-          <article class="card bg-transparent border border-secondary rounded">
-            <div class="row g-0 align-items-center">
+        var hasImage = !string.IsNullOrEmpty(post.ImageUrl);
+        var excerpt = string.IsNullOrEmpty(post.Content)
+          ? string.Empty
+          : (post.Content.Length > 300 ? post.Content[..300] + "..." : post.Content);
+        var hasNoOwner = string.IsNullOrWhiteSpace(post.CreatedByUserName);
+        var isOwner = User?.Identity?.IsAuthenticated == true && string.Equals(User.Identity?.Name, post.CreatedByUserName, StringComparison.Ordinal);
 
-              @* Branch when there is an image: split into two columns *@
-              @if (!string.IsNullOrEmpty(post.ImageUrl))
-              {
-                  <div class="col-md-4">
-                    <img src="@post.ImageUrl" alt="@post.Title" class="img-fluid rounded" style="width:100%;height:200px;object-fit:cover" />
-                  </div>
-
-                  <div class="col-md-8">
-                    <div class="card-body">
-                      <h2 class="h4 mb-1">
-                        <a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="text-decoration-none text-white">@post.Title</a>
-                      </h2>
-
-                      <div class="mb-2 text-muted small">
-                        <span class="me-1">Posted:</span> @post.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
-                        @if (!string.IsNullOrEmpty(post.AuthorName))
-                        {
-                            <span> • @post.AuthorName</span>
-                        }
-                      </div>
-
-                      @if (!string.IsNullOrWhiteSpace(post.Hashtags))
-                      {
-                          var tags = post.Hashtags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                          <div class="mb-2">
-                            @foreach (var t in tags)
-                            {
-                                <span class="badge bg-secondary me-1">#@t</span>
-                            }
-                          </div>
-                      }
-
-                      @{
-                          var excerpt = string.IsNullOrEmpty(post.Content) 
-                              ? string.Empty 
-                              : (post.Content.Length > 300 ? post.Content.Substring(0, 300) + "…" : post.Content);
-                      }
-                      <p class="mb-2 text-muted">@excerpt</p>
-
-                      <a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="btn btn-sm btn-outline-light me-2">Read more</a>
-
-                      @{
-                        var hasNoOwner = string.IsNullOrWhiteSpace(post.CreatedByUserName);
-                        var isOwner = User?.Identity?.IsAuthenticated == true && string.Equals(User.Identity?.Name, post.CreatedByUserName, StringComparison.Ordinal);
-                      }
-                      @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || hasNoOwner || isOwner))
-                      {
-                          <a asp-page="/Blogs/Edit" asp-route-id="@post.Id" class="btn btn-sm btn-secondary me-1">Edit</a>
-                          <a asp-page="/Blogs/Delete" asp-route-id="@post.Id" class="btn btn-sm btn-danger">Delete</a>
-                      }
-                    </div>
-                  </div>
-              }
-              else
-              {
-                  @* No image: single full-width column with card body *@
-                  <div class="col-12">
-                    <div class="card-body">
-                      <h2 class="h4 mb-1">
-                        <a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="text-decoration-none text-white">@post.Title</a>
-                      </h2>
-
-                      <div class="mb-2 text-muted small">
-                        <span class="me-1">Posted:</span> @post.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
-                        @if (!string.IsNullOrEmpty(post.AuthorName))
-                        {
-                            <span> • @post.AuthorName</span>
-                        }
-                      </div>
-
-                      @if (!string.IsNullOrWhiteSpace(post.Hashtags))
-                      {
-                          var tags = post.Hashtags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                          <div class="mb-2">
-                            @foreach (var t in tags)
-                            {
-                                <span class="badge bg-secondary me-1">#@t</span>
-                            }
-                          </div>
-                      }
-
-                      @{
-                          var excerpt = string.IsNullOrEmpty(post.Content) 
-                              ? string.Empty 
-                              : (post.Content.Length > 300 ? post.Content.Substring(0, 300) + "…" : post.Content);
-                      }
-                      <p class="mb-2 text-muted">@excerpt</p>
-
-                      <a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="btn btn-sm btn-outline-light me-2">Read more</a>
-
-                      @{
-                        var hasNoOwner = string.IsNullOrWhiteSpace(post.CreatedByUserName);
-                        var isOwner = User?.Identity?.IsAuthenticated == true && string.Equals(User.Identity?.Name, post.CreatedByUserName, StringComparison.Ordinal);
-                      }
-                      @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || hasNoOwner || isOwner))
-                      {
-                          <a asp-page="/Blogs/Edit" asp-route-id="@post.Id" class="btn btn-sm btn-secondary me-1">Edit</a>
-                          <a asp-page="/Blogs/Delete" asp-route-id="@post.Id" class="btn btn-sm btn-danger">Delete</a>
-                      }
-                    </div>
-                  </div> 
-              }
-
+        <article class="g-card blog-card @(hasImage ? "has-image" : "")">
+          @if (hasImage)
+          {
+            <div class="blog-card__image">
+              <img src="@post.ImageUrl" alt="@post.Title" loading="lazy" />
             </div>
-          </article>
-        </div>
+          }
+
+          <div class="blog-card__body">
+            <h2 class="blog-card__title">
+              <a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="blog-title-link">@post.Title</a>
+            </h2>
+
+            <div class="blog-card__meta">
+              <span>Posted: @post.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</span>
+              @if (!string.IsNullOrEmpty(post.AuthorName))
+              {
+                <span class="blog-card__separator">-</span>
+                <span>@post.AuthorName</span>
+              }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(post.Hashtags))
+            {
+              var tags = post.Hashtags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+              <div class="blog-card__tags">
+                @foreach (var t in tags)
+                {
+                  <span class="badge bg-secondary me-1">#@t</span>
+                }
+              </div>
+            }
+
+            <p class="blog-card__excerpt">@excerpt</p>
+
+            <div class="blog-card__actions">
+              <a asp-page="/Blogs/Details" asp-route-id="@post.Id" class="g-btn g-btn-ghost g-btn-sm">Read more</a>
+              @if (User?.Identity?.IsAuthenticated == true && (User.IsInRole("Admin") || hasNoOwner || isOwner))
+              {
+                <a asp-page="/Blogs/Edit" asp-route-id="@post.Id" class="g-btn g-btn-sm g-btn-secondary">Edit</a>
+                <a asp-page="/Blogs/Delete" asp-route-id="@post.Id" class="g-btn g-btn-sm g-btn-danger">Delete</a>
+              }
+            </div>
+          </div>
+        </article>
       }
     </div>
   }
-</div>
+</section>

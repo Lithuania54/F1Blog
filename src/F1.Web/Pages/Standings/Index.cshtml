@@ -9,7 +9,7 @@
   <div class="g-hero__shell g-hero__shell--compact">
     <div class="g-hero__copy">
       <div class="g-hero__eyebrow">Leaderboards</div>
-      <h1 class="g-hero__title">Who’s leading the fight in 2025</h1>
+      <h1 class="g-hero__title">Who's leading the fight in 2025</h1>
       <p class="g-hero__text">Official standings pulled from formula1.com.</p>
     </div>
     <div class="g-panel">
@@ -28,7 +28,6 @@
     <div class="lb-group">
       <div class="lb-header">
         <h2>Drivers</h2>
-        <span class="g-card__muted">Top 3 highlight + full table</span>
       </div>
       <div class="lb-top3">
         @foreach (var d in Model.DriverStandings.Take(3))
@@ -73,7 +72,6 @@
     <div class="lb-group">
       <div class="lb-header">
         <h2>Teams</h2>
-        <span class="g-card__muted">Top 3 highlight + full table</span>
       </div>
       <div class="lb-top3">
         @foreach (var t in Model.TeamStandings.Take(3))

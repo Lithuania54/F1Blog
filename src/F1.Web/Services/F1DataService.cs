@@ -85,6 +85,7 @@ public class F1DataService : IF1DataService
         var data = await LoadFromOfficialSiteAsync(isDriver: true, cancellationToken)
                    ?? await LoadFromLocalAsync(isDriver: true, cancellationToken)
                    ?? GetSampleDrivers();
+        data = BackfillImages(data, isDriver: true);
         _cache.Set(DriverCacheKey, data, TimeSpan.FromMinutes(5));
         return data;
     }
@@ -97,6 +98,7 @@ public class F1DataService : IF1DataService
         var data = await LoadFromOfficialSiteAsync(isDriver: false, cancellationToken)
                    ?? await LoadFromLocalAsync(isDriver: false, cancellationToken)
                    ?? GetSampleTeams();
+        data = BackfillImages(data, isDriver: false);
         _cache.Set(TeamCacheKey, data, TimeSpan.FromMinutes(5));
         return data;
     }
@@ -252,16 +254,16 @@ public class F1DataService : IF1DataService
 
     private static IReadOnlyList<StandingEntry> GetSampleDrivers() => new[]
     {
-        new StandingEntry{ Position=1, Name="Lando Norris", Team="McLaren", Points=357, Wins=5, Podiums=13, ImageUrl=BuildPlaceholder(true,"Lando Norris"), AccentColor="#f85b60"},
-        new StandingEntry{ Position=2, Name="Max Verstappen", Team="Red Bull Racing", Points=344, Wins=6, Podiums=12, ImageUrl=BuildPlaceholder(true,"Max Verstappen"), AccentColor="#f85b60"},
-        new StandingEntry{ Position=3, Name="Charles Leclerc", Team="Ferrari", Points=301, Wins=3, Podiums=10, ImageUrl=BuildPlaceholder(true,"Charles Leclerc"), AccentColor="#f85b60"},
+        new StandingEntry{ Position=1, Name="Lando Norris", Team="McLaren", Points=357, Wins=5, Podiums=13, ImageUrl=BuildOfficialImageUrl("Lando Norris","McLaren", true), AccentColor="#f85b60"},
+        new StandingEntry{ Position=2, Name="Max Verstappen", Team="Red Bull Racing", Points=344, Wins=6, Podiums=12, ImageUrl=BuildOfficialImageUrl("Max Verstappen","Red Bull Racing", true), AccentColor="#f85b60"},
+        new StandingEntry{ Position=3, Name="Charles Leclerc", Team="Ferrari", Points=301, Wins=3, Podiums=10, ImageUrl=BuildOfficialImageUrl("Charles Leclerc","Ferrari", true), AccentColor="#f85b60"},
     };
 
     private static IReadOnlyList<StandingEntry> GetSampleTeams() => new[]
     {
-        new StandingEntry{ Position=1, Name="McLaren", Points=658, Wins=8, Podiums=20, ImageUrl=BuildPlaceholder(false,"McLaren"), AccentColor="#7a5af8"},
-        new StandingEntry{ Position=2, Name="Red Bull Racing", Points=612, Wins=7, Podiums=19, ImageUrl=BuildPlaceholder(false,"Red Bull"), AccentColor="#7a5af8"},
-        new StandingEntry{ Position=3, Name="Ferrari", Points=577, Wins=5, Podiums=17, ImageUrl=BuildPlaceholder(false,"Ferrari"), AccentColor="#7a5af8"},
+        new StandingEntry{ Position=1, Name="McLaren", Points=658, Wins=8, Podiums=20, ImageUrl=BuildOfficialImageUrl("McLaren", string.Empty, false), AccentColor="#7a5af8"},
+        new StandingEntry{ Position=2, Name="Red Bull Racing", Points=612, Wins=7, Podiums=19, ImageUrl=BuildOfficialImageUrl("Red Bull Racing", string.Empty, false), AccentColor="#7a5af8"},
+        new StandingEntry{ Position=3, Name="Ferrari", Points=577, Wins=5, Podiums=17, ImageUrl=BuildOfficialImageUrl("Ferrari", string.Empty, false), AccentColor="#7a5af8"},
     };
 
     private static bool TryGetArray(JsonElement root, out JsonElement arrayElement, params string[] candidateNames)
@@ -308,6 +310,23 @@ public class F1DataService : IF1DataService
         var label = Uri.EscapeDataString(name);
         var bg = isDriver ? "ffe2dc" : "e2ddff";
         return $"https://dummyimage.com/320x320/{bg}/1f1a17.jpg&text={label}";
+    }
+
+    private static bool NeedsImage(string? url)
+    {
+        return string.IsNullOrWhiteSpace(url) || url.Contains("dummyimage.com", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static IReadOnlyList<StandingEntry> BackfillImages(IReadOnlyList<StandingEntry> entries, bool isDriver)
+    {
+        foreach (var entry in entries)
+        {
+            if (NeedsImage(entry.ImageUrl))
+            {
+                entry.ImageUrl = BuildOfficialImageUrl(entry.Name, entry.Team, isDriver);
+            }
+        }
+        return entries;
     }
 
     private async Task<NextRaceInfo?> LoadNextRaceFromOfficialSiteAsync(CancellationToken cancellationToken)

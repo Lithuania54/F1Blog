@@ -5,36 +5,50 @@
     ViewData["Title"] = "Log in";
 }
 
-<div class="container min-vh-100 d-flex align-items-center justify-content-center">
-  <div class="card bg-black text-light shadow-lg" style="max-width: 520px; width: 100%; border: 1px solid rgba(255,255,255,0.06)">
-    <div class="card-body p-4 p-md-5">
-      <h2 class="mb-4 text-center">Welcome back</h2>
+<section class="g-auth">
+  <div class="g-auth__grid">
+    <div class="g-auth__copy">
+      <div class="g-hero__eyebrow">Garage access</div>
+      <h1 class="g-hero__title">Log back in</h1>
+      <p class="g-hero__text">Pick up where you left off with saved posts, predictions, and race-weekend alerts.</p>
+      <div class="g-pill-row">
+        <span class="g-tag">Sync across devices</span>
+        <span class="g-tag">Follow teams</span>
+        <span class="g-tag">Write &amp; comment</span>
+      </div>
+    </div>
 
-      <form method="post" novalidate>
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <div class="g-form-card">
+      <div class="g-form-card__header">
+        <div class="g-card__title">Log in</div>
+        <div class="g-card__muted">Use the email and password you registered with.</div>
+      </div>
+
+      <form method="post" novalidate class="g-form-grid">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="ReturnUrl" />
 
-        <div class="mb-3">
+        <div class="g-field">
           <label asp-for="Input.Email" class="form-label">Email</label>
-          <input asp-for="Input.Email" class="form-control bg-dark text-light border-secondary" autocomplete="username" />
+          <input asp-for="Input.Email" class="form-control" autocomplete="username" />
           <span asp-validation-for="Input.Email" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
+        <div class="g-field">
           <label asp-for="Input.Password" class="form-label">Password</label>
-          <input asp-for="Input.Password" class="form-control bg-dark text-light border-secondary" autocomplete="current-password" />
+          <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
           <span asp-validation-for="Input.Password" class="text-danger"></span>
         </div>
 
-        <div class="form-check mb-4">
+        <div class="form-check">
           <input asp-for="Input.RememberMe" class="form-check-input" />
           <label asp-for="Input.RememberMe" class="form-check-label">Remember me</label>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100">Log in</button>
+        <button type="submit" class="g-btn g-btn-accent g-btn-block">Log in</button>
       </form>
     </div>
   </div>
-</div>
+</section>
 
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }
