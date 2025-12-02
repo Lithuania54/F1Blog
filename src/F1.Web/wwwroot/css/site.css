@@ -31,7 +31,7 @@ body,
 }
 
 .g-main {
-  padding-top: 12px;
+  padding-top: 0;
   flex: 1;
 }
 
@@ -715,7 +715,7 @@ a:hover {
   height: 72px;
   border-radius: 14px;
   background-size: cover;
-  background-position: center;
+  background-position: top center;
   background-repeat: no-repeat;
   border: 1px solid var(--border);
   box-shadow: 0 8px 18px rgba(0,0,0,0.06);
@@ -850,7 +850,7 @@ select:focus-visible {
   }
 
   .g-main {
-    padding-top: 120px;
+    padding-top: 0;
   }
 
   .g-hero {

@@ -33,12 +33,12 @@ public class F1DataService : IF1DataService
 
     private static readonly Dictionary<string, string> DriverImages = new(StringComparer.OrdinalIgnoreCase)
     {
-        { "Max Verstappen", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/max-verstappen/red-bull-racing.png" },
+        { "Max Verstappen", "/images3/verstappen.png" },
         { "Sergio Perez", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/sergio-perez/red-bull-racing.png" },
         { "Charles Leclerc", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/charles-leclerc/ferrari.png" },
         { "Carlos Sainz", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/carlos-sainz/ferrari.png" },
-        { "Lando Norris", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/lando-norris/mclaren.png" },
-        { "Oscar Piastri", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/oscar-piastri/mclaren.png" },
+        { "Lando Norris", "/images3/norris.png" },
+        { "Oscar Piastri", "/images3/piastri.png" },
         { "George Russell", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/george-russell/mercedes.png" },
         { "Lewis Hamilton", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/lewis-hamilton/mercedes.png" },
         { "Fernando Alonso", "https://media.formula1.com/content/dam/fom-website/drivers/2024Drivers/fernando-alonso/aston-martin.png" },
