@@ -11,7 +11,7 @@
       <p class="game-kicker">Arcade</p>
       <h1 class="game-title">Race the F1 Garage build</h1>
       <p class="game-subtitle">
-        This is the exact Godot WebGL export from the <code>kuba--/f1</code> project, bundled here with the same cars, tracks, and handling.
+        Drive the bundled Godot WebGL build right in your browser—no installs needed.
       </p>
       <div class="game-controls">
         <div class="game-controls__item"><span>W / ↑</span><span>Throttle</span></div>
@@ -234,6 +234,47 @@
 }
 
 @section Scripts {
+  <script>
+    // Force a safe storage shim so Godot's get_unique_id() never fails, even when the browser blocks storage.
+    (function () {
+      function makeMemoryStorage() {
+        const store = {};
+        return {
+          getItem: (k) => (k in store ? store[k] : null),
+          setItem: (k, v) => { store[k] = String(v); },
+          removeItem: (k) => { delete store[k]; },
+          clear: () => { Object.keys(store).forEach((k) => delete store[k]); },
+          key: (i) => Object.keys(store)[i] ?? null,
+          get length() { return Object.keys(store).length; }
+        };
+      }
+      function forceStorage(name) {
+        let storage;
+        try {
+          const testKey = '__godot_storage_test__';
+          storage = window[name];
+          storage.setItem(testKey, '1');
+          storage.removeItem(testKey);
+        } catch (_) {
+          storage = makeMemoryStorage();
+          Object.defineProperty(window, name, {
+            value: storage,
+            configurable: true
+          });
+          console.warn(`Tracking prevention blocked ${name}; using in-memory fallback.`);
+        }
+        return storage;
+      }
+      const ls = forceStorage('localStorage');
+      forceStorage('sessionStorage');
+      try {
+        if (!ls.getItem('GodotUserId')) {
+          const guid = (globalThis.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now());
+          ls.setItem('GodotUserId', guid);
+        }
+      } catch (_) { /* ignore */ }
+    })();
+  </script>
   <script src="~/game/index.js"></script>
   <script>
     const GODOT_CONFIG = {
@@ -257,6 +298,7 @@
       var statusProgressInner = document.getElementById('status-progress-inner');
       var statusIndeterminate = document.getElementById('status-indeterminate');
       var statusNotice = document.getElementById('status-notice');
+      var statusWrapper = document.getElementById('status');
 
       var initializing = true;
       var statusMode = 'hidden';
@@ -281,15 +323,19 @@
         switch (mode) {
           case 'progress':
             statusProgress.style.display = 'block';
+            statusWrapper.style.visibility = 'visible';
             break;
           case 'indeterminate':
             statusIndeterminate.style.display = 'block';
             animationCallbacks.push(animateStatusIndeterminate);
+            statusWrapper.style.visibility = 'visible';
             break;
           case 'notice':
             statusNotice.style.display = 'block';
+            statusWrapper.style.visibility = 'visible';
             break;
           case 'hidden':
+            statusWrapper.style.visibility = 'hidden';
             break;
           default:
             throw new Error('Invalid status mode');

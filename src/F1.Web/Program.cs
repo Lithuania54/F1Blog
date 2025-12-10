@@ -7,6 +7,7 @@
 // - Applies pending EF migrations on startup (development convenience)
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
@@ -78,8 +79,17 @@ Directory.CreateDirectory(images2Path);
 // Static File Setup
 // --------------------
 
+// Allow serving .pck Godot bundle files
+var contentTypeProvider = new FileExtensionContentTypeProvider();
+contentTypeProvider.Mappings[".pck"] = "application/octet-stream";
+// Explicitly map .wasm so WebAssembly streaming/instantiation is allowed by browsers
+contentTypeProvider.Mappings[".wasm"] = "application/wasm";
+
 // Default static file provider (wwwroot)
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = contentTypeProvider
+});
 
 // Serve images from ContentRootPath/images at /images
 app.UseStaticFiles(new StaticFileOptions
