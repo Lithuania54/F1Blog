@@ -1,4 +1,4 @@
 
 # F1 svetainė
 
-Numeris vienas F1 Blog'ų svetainė Lietuvoje.
+Numeris vienas F1 svetainė Lietuvoje.
