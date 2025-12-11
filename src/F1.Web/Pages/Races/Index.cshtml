@@ -19,7 +19,6 @@
             <div class="position-absolute bottom-0 start-0 p-3 text-white">
               <h5 class="mb-1">@((race!=null)?race.Name:"Upcoming Race")</h5>
               <div class="small">@((race!=null)?race.Location:"Location") - @((race!=null)?race.Date.ToString("yyyy-MM-dd"):"")</div>
-              <div class="mt-2"><a class="btn btn-sm btn-outline-light" href="#">View details (coming soon)</a></div>
             </div>
           </div>
         }
@@ -37,23 +36,57 @@
 
 <section class="g-section">
   <div class="g-container">
-    <div class="g-card">
-      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
-        <div>
-          <div class="g-hero__eyebrow">New • Interactive</div>
-          <h2 class="g-hero__title" style="font-size: clamp(1.6rem, 3vw, 2.2rem); margin: 8px 0 6px;">Race-weekend dashboard</h2>
-          <p class="g-card__muted mb-3">Track every stint live, see tire-wear projections, and overlay evolving weather to plan strategy in real time.</p>
-          <div class="g-pill-row">
-            <span class="g-tag">Live stint tracker</span>
-            <span class="g-tag">Tyre deg curves</span>
-            <span class="g-tag">Weather radar overlay</span>
-          </div>
-        </div>
-        <div class="d-flex flex-column gap-2">
-          <a class="g-btn g-btn-accent" href="#">Open dashboard (beta)</a>
-          <span class="g-card__muted">Optimized for tablet/desktop. Mobile view coming soon.</span>
-        </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+      <div>
+        <div class="g-hero__eyebrow">Season calendar</div>
+        <h2 class="h4 mb-1">Race Weekends</h2>
+        <p class="g-card__muted mb-0">Upcoming and recent rounds with quick links to the circuit.</p>
       </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th scope="col" class="text-muted small">Round</th>
+            <th scope="col" class="text-muted small">Race</th>
+            <th scope="col" class="text-muted small">Location</th>
+            <th scope="col" class="text-muted small">Date</th>
+            <th scope="col" class="text-muted small">Map</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if(Model.Races?.Any() == true)
+          {
+            var round = 1;
+            foreach (var race in Model.Races)
+            {
+              <tr>
+                <th scope="row">@round</th>
+                <td class="fw-semibold">@race.Name</td>
+                <td class="text-muted">@race.Location</td>
+                <td>@race.Date.ToString("yyyy-MM-dd")</td>
+                <td>
+                  @if(!string.IsNullOrWhiteSpace(race.MapUrl))
+                  {
+                    <a href="@race.MapUrl" target="_blank" rel="noopener" class="link-secondary">View</a>
+                  }
+                  else
+                  {
+                    <span class="text-muted">-</span>
+                  }
+                </td>
+              </tr>
+              round++;
+            }
+          }
+          else
+          {
+            <tr>
+              <td colspan="5" class="text-muted">No race weekends available.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
   </div>
 </section>

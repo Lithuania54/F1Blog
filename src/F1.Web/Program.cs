@@ -47,6 +47,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 // --------------------
 // Services Registration
 // --------------------
+builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor(); // Needed for _Nav.cshtml
 builder.Services.AddMemoryCache();
@@ -79,11 +80,7 @@ Directory.CreateDirectory(images2Path);
 // Static File Setup
 // --------------------
 
-// Allow serving .pck Godot bundle files
 var contentTypeProvider = new FileExtensionContentTypeProvider();
-contentTypeProvider.Mappings[".pck"] = "application/octet-stream";
-// Explicitly map .wasm so WebAssembly streaming/instantiation is allowed by browsers
-contentTypeProvider.Mappings[".wasm"] = "application/wasm";
 
 // Default static file provider (wwwroot)
 app.UseStaticFiles(new StaticFileOptions
@@ -128,6 +125,10 @@ app.UseSerilogRequestLogging();
 
 app.UseAuthentication(); // Identity
 app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
 

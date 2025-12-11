@@ -254,16 +254,16 @@ public class F1DataService : IF1DataService
 
     private static IReadOnlyList<StandingEntry> GetSampleDrivers() => new[]
     {
-        new StandingEntry{ Position=1, Name="Lando Norris", Team="McLaren", Points=357, Wins=5, Podiums=13, ImageUrl=BuildOfficialImageUrl("Lando Norris","McLaren", true), AccentColor="#f85b60"},
-        new StandingEntry{ Position=2, Name="Max Verstappen", Team="Red Bull Racing", Points=344, Wins=6, Podiums=12, ImageUrl=BuildOfficialImageUrl("Max Verstappen","Red Bull Racing", true), AccentColor="#f85b60"},
-        new StandingEntry{ Position=3, Name="Charles Leclerc", Team="Ferrari", Points=301, Wins=3, Podiums=10, ImageUrl=BuildOfficialImageUrl("Charles Leclerc","Ferrari", true), AccentColor="#f85b60"},
+        new StandingEntry{ Position=1, Name="Max Verstappen", Team="Red Bull Racing", Points=327, Wins=7, Podiums=11, ImageUrl=BuildOfficialImageUrl("Max Verstappen","Red Bull Racing", true), AccentColor="#f85b60"},
+        new StandingEntry{ Position=2, Name="Lando Norris", Team="McLaren", Points=282, Wins=3, Podiums=10, ImageUrl=BuildOfficialImageUrl("Lando Norris","McLaren", true), AccentColor="#f85b60"},
+        new StandingEntry{ Position=3, Name="Charles Leclerc", Team="Ferrari", Points=264, Wins=2, Podiums=9, ImageUrl=BuildOfficialImageUrl("Charles Leclerc","Ferrari", true), AccentColor="#f85b60"},
     };
 
     private static IReadOnlyList<StandingEntry> GetSampleTeams() => new[]
     {
-        new StandingEntry{ Position=1, Name="McLaren", Points=658, Wins=8, Podiums=20, ImageUrl=BuildOfficialImageUrl("McLaren", string.Empty, false), AccentColor="#7a5af8"},
-        new StandingEntry{ Position=2, Name="Red Bull Racing", Points=612, Wins=7, Podiums=19, ImageUrl=BuildOfficialImageUrl("Red Bull Racing", string.Empty, false), AccentColor="#7a5af8"},
-        new StandingEntry{ Position=3, Name="Ferrari", Points=577, Wins=5, Podiums=17, ImageUrl=BuildOfficialImageUrl("Ferrari", string.Empty, false), AccentColor="#7a5af8"},
+        new StandingEntry{ Position=1, Name="McLaren", Points=496, Wins=5, Podiums=16, ImageUrl=BuildOfficialImageUrl("McLaren", string.Empty, false), AccentColor="#7a5af8"},
+        new StandingEntry{ Position=2, Name="Red Bull Racing", Points=493, Wins=7, Podiums=16, ImageUrl=BuildOfficialImageUrl("Red Bull Racing", string.Empty, false), AccentColor="#7a5af8"},
+        new StandingEntry{ Position=3, Name="Ferrari", Points=475, Wins=3, Podiums=16, ImageUrl=BuildOfficialImageUrl("Ferrari", string.Empty, false), AccentColor="#7a5af8"},
     };
 
     private static bool TryGetArray(JsonElement root, out JsonElement arrayElement, params string[] candidateNames)
@@ -331,16 +331,19 @@ public class F1DataService : IF1DataService
 
     private async Task<NextRaceInfo?> LoadNextRaceFromOfficialSiteAsync(CancellationToken cancellationToken)
     {
+        using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeoutCts.CancelAfter(TimeSpan.FromSeconds(8)); // keep scraper fast so it never blocks page render
+
         try
         {
             var year = DateTime.UtcNow.Year;
             var url = $"https://www.formula1.com/en/racing/{year}.html";
             using var req = new HttpRequestMessage(HttpMethod.Get, url);
             req.Headers.UserAgent.ParseAdd("Mozilla/5.0 (compatible; F1DataService/1.0)");
-            var response = await _httpClient.SendAsync(req, cancellationToken);
+            var response = await _httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, timeoutCts.Token);
             response.EnsureSuccessStatusCode();
 
-            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            await using var stream = await response.Content.ReadAsStreamAsync(timeoutCts.Token);
             var doc = new HtmlDocument();
             doc.Load(stream);
 
@@ -373,6 +376,11 @@ public class F1DataService : IF1DataService
                 LocalStartDisplay = when,
                 TrackMapUrl = string.Empty
             };
+        }
+        catch (OperationCanceledException oce) when (timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogWarning(oce, "Timed out while scraping next race info.");
+            return null;
         }
         catch (Exception ex)
         {

@@ -1,16 +1,14 @@
 {
   "Races": [
-    { "Date": "2025-03-30", "Name": "Australian Grand Prix", "Location": "Melbourne, Australia", "MapUrl": "https://maps.example.com/aus" },
-    { "Date": "2025-05-25", "Name": "Monaco Grand Prix", "Location": "Monte Carlo, Monaco", "MapUrl": "https://maps.example.com/mco" },
-    { "Date": "2025-07-20", "Name": "British Grand Prix", "Location": "Silverstone, UK", "MapUrl": "https://maps.example.com/gb" }
-  ]
-}
-{
-  "Races": [
-    { "Id": "bahrain", "Name": "Bahrain Grand Prix", "Location": "Sakhir, Bahrain", "Date": "2025-03-30T15:00:00Z", "MapUrl": "https://www.google.com/maps/place/Bahrain+International+Circuit" },
+    { "Id": "bahrain", "Name": "Bahrain Grand Prix", "Location": "Sakhir, Bahrain", "Date": "2025-03-16T15:00:00Z", "MapUrl": "https://www.google.com/maps/place/Bahrain+International+Circuit" },
+    { "Id": "saudi", "Name": "Saudi Arabian Grand Prix", "Location": "Jeddah, Saudi Arabia", "Date": "2025-03-30T17:00:00Z", "MapUrl": "https://www.google.com/maps/place/Jeddah+Corniche+Circuit" },
+    { "Id": "australia", "Name": "Australian Grand Prix", "Location": "Melbourne, Australia", "Date": "2025-04-13T05:00:00Z", "MapUrl": "https://www.google.com/maps/place/Albert+Park+Circuit" },
+    { "Id": "japan", "Name": "Japanese Grand Prix", "Location": "Suzuka, Japan", "Date": "2025-04-27T06:00:00Z", "MapUrl": "https://www.google.com/maps/place/Suzuka+International+Racing+Course" },
+    { "Id": "miami", "Name": "Miami Grand Prix", "Location": "Miami, USA", "Date": "2025-05-11T19:00:00Z", "MapUrl": "https://www.google.com/maps/place/Hard+Rock+Stadium" },
     { "Id": "monaco", "Name": "Monaco Grand Prix", "Location": "Monte Carlo, Monaco", "Date": "2025-05-25T13:00:00Z", "MapUrl": "https://www.google.com/maps/place/Circuit+de+Monaco" },
+    { "Id": "canada", "Name": "Canadian Grand Prix", "Location": "Montreal, Canada", "Date": "2025-06-08T18:00:00Z", "MapUrl": "https://www.google.com/maps/place/Circuit+Gilles+Villeneuve" },
     { "Id": "britain", "Name": "British Grand Prix", "Location": "Silverstone, UK", "Date": "2025-07-06T13:00:00Z", "MapUrl": "https://www.google.com/maps/place/Silverstone+Circuit" },
     { "Id": "belgium", "Name": "Belgian Grand Prix", "Location": "Spa-Francorchamps, Belgium", "Date": "2025-08-24T13:00:00Z", "MapUrl": "https://www.google.com/maps/place/Circuit+de+Spa-Francorchamps" },
-    { "Id": "italy", "Name": "Italian Grand Prix", "Location": "Monza, Italy", "Date": "2025-09-07T13:00:00Z", "MapUrl": "https://www.google.com/maps/place/Autodromo+Nazionaledi+Monza" }
+    { "Id": "italy", "Name": "Italian Grand Prix", "Location": "Monza, Italy", "Date": "2025-09-07T13:00:00Z", "MapUrl": "https://www.google.com/maps/place/Autodromo+Nazionale+Monza" }
   ]
 }
