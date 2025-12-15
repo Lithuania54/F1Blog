@@ -44,6 +44,11 @@ namespace F1.Web.Pages.Blogs
             if (string.IsNullOrWhiteSpace(Post?.AuthorName))
                 ModelState.AddModelError("Post.AuthorName", "Your name is required.");
 
+            if (Post == null)
+            {
+                ModelState.AddModelError(string.Empty, "Post data is missing.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -55,12 +60,12 @@ namespace F1.Web.Pages.Blogs
                 var content = string.Join("\n\n", contentBlocks);
 
                 var hashtags = Request.Form["HashtagInputs"]
+                    .Select(s => s?.Trim())
                     .Where(s => !string.IsNullOrWhiteSpace(s))
-                    .Select(s => s.Trim())
                     .ToArray();
                 var hashtagsCsv = string.Join(',', hashtags);
 
-                Post.Content = content;
+                Post!.Content = content;
                 Post.Hashtags = hashtagsCsv;
                 Post.CreatedAt = DateTime.UtcNow;
                 Post.CreatedByUserName = User?.Identity?.Name ?? string.Empty;

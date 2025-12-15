@@ -1,5 +1,6 @@
 @page
 @model F1.Web.Pages.Standings.IndexModel
+@using System.Linq
 @{
     Layout = "~/Pages/Shared/_Layout.cshtml";
     ViewData["Title"] = "Standings";
@@ -10,7 +11,6 @@
     <div class="g-hero__copy">
       <div class="g-hero__eyebrow">Leaderboards</div>
       <h1 class="g-hero__title">Who's leading the fight in 2025</h1>
-      <p class="g-hero__text">Official standings pulled from formula1.com.</p>
     </div>
     <div class="g-panel">
       <div class="g-card__title mb-1">Next race</div>
@@ -74,15 +74,17 @@
         <h2>Teams</h2>
       </div>
       <div class="lb-top3">
-        @foreach (var t in Model.TeamStandings.Take(3))
+        @foreach (var entry in Model.TeamStandings.Take(3).Select((team, idx) => new { team, idx }))
         {
-          <article class="lb-card">
+          var podiumClass = entry.idx == 0 ? "podium-first" : entry.idx == 1 ? "podium-second" : "podium-third";
+          <article class="lb-card lb-card--podium @podiumClass">
+            <div class="lb-chip lb-chip--podium">#@(entry.idx + 1)</div>
             <div class="lb-card__body">
-              <div class="lb-img lb-img--team" style="background-image:url('@t.ImageUrl');"></div>
+              <div class="lb-img lb-img--team lb-img--podium" style="background-image:url('@entry.team.ImageUrl');"></div>
               <div>
-                <div class="lb-name">@t.Name</div>
+                <div class="lb-name">@entry.team.Name</div>
                 <div class="lb-meta">Constructor</div>
-                <div class="lb-points">@t.Points pts</div>
+                <div class="lb-points">@entry.team.Points pts</div>
               </div>
             </div>
           </article>

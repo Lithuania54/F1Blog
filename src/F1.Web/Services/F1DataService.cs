@@ -1,5 +1,4 @@
 using System;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,6 +24,7 @@ public class F1DataService : IF1DataService
     private readonly IWebHostEnvironment _env;
     private readonly IMemoryCache _cache;
     private readonly ILogger<F1DataService> _logger;
+    private readonly IF1ResultsService _resultsService;
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private const string DriverCacheKey = "f1:drivers";
@@ -69,38 +69,51 @@ public class F1DataService : IF1DataService
         { "Sauber", "https://media.formula1.com/content/dam/fom-website/teams/2024/kick-sauber.png" }
     };
 
-    public F1DataService(HttpClient httpClient, IWebHostEnvironment env, IMemoryCache cache, ILogger<F1DataService> logger)
+    public F1DataService(HttpClient httpClient, IWebHostEnvironment env, IMemoryCache cache, ILogger<F1DataService> logger, IF1ResultsService resultsService)
     {
         _httpClient = httpClient;
         _env = env;
         _cache = cache;
         _logger = logger;
+        _resultsService = resultsService;
     }
 
     public async Task<IReadOnlyList<StandingEntry>> GetDriverStandingsAsync(CancellationToken cancellationToken = default)
     {
+        var live = await _resultsService.GetDriverStandingsAsync(cancellationToken);
+        if (live.Count > 0)
+        {
+            var enriched = BackfillImages(live, isDriver: true);
+            _cache.Set(DriverCacheKey, enriched, TimeSpan.FromMinutes(5));
+            return enriched;
+        }
+
         if (_cache.TryGetValue(DriverCacheKey, out IReadOnlyList<StandingEntry>? cached) && cached != null)
             return cached;
 
-        var data = await LoadFromOfficialSiteAsync(isDriver: true, cancellationToken)
-                   ?? await LoadFromLocalAsync(isDriver: true, cancellationToken)
-                   ?? GetSampleDrivers();
-        data = BackfillImages(data, isDriver: true);
-        _cache.Set(DriverCacheKey, data, TimeSpan.FromMinutes(5));
-        return data;
+        var fallback = await LoadFromLocalAsync(isDriver: true, cancellationToken) ?? GetSampleDrivers();
+        fallback = BackfillImages(fallback, isDriver: true);
+        _cache.Set(DriverCacheKey, fallback, TimeSpan.FromMinutes(5));
+        return fallback;
     }
 
     public async Task<IReadOnlyList<StandingEntry>> GetConstructorStandingsAsync(CancellationToken cancellationToken = default)
     {
+        var live = await _resultsService.GetConstructorStandingsAsync(cancellationToken);
+        if (live.Count > 0)
+        {
+            var enriched = BackfillImages(live, isDriver: false);
+            _cache.Set(TeamCacheKey, enriched, TimeSpan.FromMinutes(5));
+            return enriched;
+        }
+
         if (_cache.TryGetValue(TeamCacheKey, out IReadOnlyList<StandingEntry>? cached) && cached != null)
             return cached;
 
-        var data = await LoadFromOfficialSiteAsync(isDriver: false, cancellationToken)
-                   ?? await LoadFromLocalAsync(isDriver: false, cancellationToken)
-                   ?? GetSampleTeams();
-        data = BackfillImages(data, isDriver: false);
-        _cache.Set(TeamCacheKey, data, TimeSpan.FromMinutes(5));
-        return data;
+        var fallback = await LoadFromLocalAsync(isDriver: false, cancellationToken) ?? GetSampleTeams();
+        fallback = BackfillImages(fallback, isDriver: false);
+        _cache.Set(TeamCacheKey, fallback, TimeSpan.FromMinutes(5));
+        return fallback;
     }
 
     public async Task<NextRaceInfo> GetNextRaceAsync(CancellationToken cancellationToken = default)
@@ -108,7 +121,9 @@ public class F1DataService : IF1DataService
         if (_cache.TryGetValue(NextRaceCacheKey, out NextRaceInfo? cached) && cached != null)
             return cached;
 
-        var info = await LoadNextRaceFromOfficialSiteAsync(cancellationToken) ?? GetSampleNextRace();
+        var info = await LoadNextRaceFromOfficialSiteAsync(cancellationToken)
+                   ?? await LoadNextRaceFromErgastAsync(cancellationToken)
+                   ?? GetSampleNextRace();
         _cache.Set(NextRaceCacheKey, info, TimeSpan.FromMinutes(10));
         return info;
     }
@@ -117,6 +132,7 @@ public class F1DataService : IF1DataService
     {
         _cache.Remove(DriverCacheKey);
         _cache.Remove(TeamCacheKey);
+        await _resultsService.RefreshAsync(cancellationToken);
         await GetDriverStandingsAsync(cancellationToken);
         await GetConstructorStandingsAsync(cancellationToken);
     }
@@ -385,6 +401,50 @@ public class F1DataService : IF1DataService
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to scrape next race info.");
+            return null;
+        }
+    }
+
+    private async Task<NextRaceInfo?> LoadNextRaceFromErgastAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var req = new HttpRequestMessage(HttpMethod.Get, "https://ergast.com/api/f1/current/next.json");
+            req.Headers.UserAgent.ParseAdd("Mozilla/5.0 (compatible; F1DataService/1.0)");
+            var response = await _httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+            if (!doc.RootElement.TryGetProperty("MRData", out var mrData)) return null;
+            if (!mrData.TryGetProperty("RaceTable", out var raceTable)) return null;
+            if (!raceTable.TryGetProperty("Races", out var races) || races.ValueKind != JsonValueKind.Array || races.GetArrayLength() == 0) return null;
+
+            var race = races.EnumerateArray().First();
+            var date = GetString(race, "date") ?? string.Empty;
+            var time = GetString(race, "time") ?? "00:00:00Z";
+            var dateTimeRaw = $"{date}T{time}".Trim();
+            if (!dateTimeRaw.EndsWith("Z", StringComparison.OrdinalIgnoreCase)) dateTimeRaw += "Z";
+            var start = DateTimeOffset.TryParse(dateTimeRaw, out var parsed) ? parsed : DateTimeOffset.UtcNow.AddDays(7);
+
+            race.TryGetProperty("Circuit", out var circuit);
+            var country = circuit.ValueKind == JsonValueKind.Object && circuit.TryGetProperty("Location", out var loc)
+                ? GetString(loc, "country") ?? string.Empty
+                : string.Empty;
+
+            return new NextRaceInfo
+            {
+                Name = GetString(race, "raceName") ?? "Next Grand Prix",
+                Country = country,
+                Circuit = GetString(circuit, "circuitName") ?? string.Empty,
+                StartTimeUtc = start,
+                LocalStartDisplay = start.ToLocalTime().ToString("ddd HH:mm (local)"),
+                TrackMapUrl = string.Empty
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to fetch next race from Ergast.");
             return null;
         }
     }

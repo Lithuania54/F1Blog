@@ -17,8 +17,11 @@
           <div class="swiper-slide">
             <img src="@img" alt="Track @i" loading="lazy" />
             <div class="position-absolute bottom-0 start-0 p-3 text-white">
-              <h5 class="mb-1">@((race!=null)?race.Name:"Upcoming Race")</h5>
-              <div class="small">@((race!=null)?race.Location:"Location") - @((race!=null)?race.Date.ToString("yyyy-MM-dd"):"")</div>
+              @if (race != null)
+              {
+                <h5 class="mb-1">@race.Name</h5>
+                <div class="small">@race.Location - @race.Date.ToString("yyyy-MM-dd")</div>
+              }
             </div>
           </div>
         }
@@ -33,60 +36,3 @@
     <div class="alert alert-warning">No track images found. Add image files (PNG/AVIF/JPG/WEBP) to <code>src/F1.Web/wwwroot/images2/</code> or <code>src/F1.Web/images2/</code> to enable the tracks carousel.</div>
   }
 </div>
-
-<section class="g-section">
-  <div class="g-container">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-      <div>
-        <div class="g-hero__eyebrow">Season calendar</div>
-        <h2 class="h4 mb-1">Race Weekends</h2>
-        <p class="g-card__muted mb-0">Upcoming and recent rounds with quick links to the circuit.</p>
-      </div>
-    </div>
-    <div class="table-responsive">
-      <table class="table align-middle">
-        <thead>
-          <tr>
-            <th scope="col" class="text-muted small">Round</th>
-            <th scope="col" class="text-muted small">Race</th>
-            <th scope="col" class="text-muted small">Location</th>
-            <th scope="col" class="text-muted small">Date</th>
-            <th scope="col" class="text-muted small">Map</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if(Model.Races?.Any() == true)
-          {
-            var round = 1;
-            foreach (var race in Model.Races)
-            {
-              <tr>
-                <th scope="row">@round</th>
-                <td class="fw-semibold">@race.Name</td>
-                <td class="text-muted">@race.Location</td>
-                <td>@race.Date.ToString("yyyy-MM-dd")</td>
-                <td>
-                  @if(!string.IsNullOrWhiteSpace(race.MapUrl))
-                  {
-                    <a href="@race.MapUrl" target="_blank" rel="noopener" class="link-secondary">View</a>
-                  }
-                  else
-                  {
-                    <span class="text-muted">-</span>
-                  }
-                </td>
-              </tr>
-              round++;
-            }
-          }
-          else
-          {
-            <tr>
-              <td colspan="5" class="text-muted">No race weekends available.</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>

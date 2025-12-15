@@ -30,7 +30,7 @@ namespace F1.Web.Pages
             await LoadCarouselAsync();
         }
 
-        private async Task LoadCarouselAsync()
+        private Task LoadCarouselAsync()
         {
             try
             {
@@ -42,7 +42,7 @@ namespace F1.Web.Pages
                 {
                     _logger.LogWarning("Carousel images directories not found: {WwwImagesDir} or {RepoImagesDir}.", wwwImagesDir, repoImagesDir);
                     CarouselNotFoundMessage = "No carousel images found. Add 1.png..10.png (or 1.avif..1.webp) to src/F1.Web/wwwroot/images/ or src/F1.Web/images/ to enable the hero carousel.";
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 var preferredExts = new[] { ".png", ".avif", ".webp", ".jpg", ".jpeg" };
@@ -86,6 +86,8 @@ namespace F1.Web.Pages
                 _logger.LogError(ex, "Error while scanning carousel images");
                 CarouselNotFoundMessage = "Unable to load hero images at the moment.";
             }
+
+            return Task.CompletedTask;
         }
     }
 }

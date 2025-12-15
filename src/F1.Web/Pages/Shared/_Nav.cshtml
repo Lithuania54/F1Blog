@@ -8,6 +8,7 @@
     var path = HttpContextAccessor?.HttpContext?.Request?.Path.Value?.TrimEnd('/')?.ToLowerInvariant() ?? "/";
     bool IsActivePrefix(string p) => path.StartsWith(p.TrimEnd('/').ToLowerInvariant());
     var userInitial = User?.Identity?.Name?.FirstOrDefault();
+    var principal = User ?? new System.Security.Claims.ClaimsPrincipal();
 }
 
 <header class="g-nav" role="banner">
@@ -29,7 +30,7 @@
     </nav>
 
     <div class="g-nav__actions">
-      @if (SignInManager.IsSignedIn(User))
+      @if (SignInManager.IsSignedIn(principal))
       {
           <a class="g-btn g-btn-accent" asp-page="/Blogs/Create">Write a blog</a>
           <div class="g-avatar">@((userInitial.HasValue && !char.IsControl(userInitial.Value)) ? userInitial.Value.ToString().ToUpper() : "F")</div>
