@@ -307,9 +307,11 @@
       let brake = 0;
 
       if (input) {
-        const left = input.left ? 1 : 0;
-        const right = input.right ? 1 : 0;
-        steerInput = right - left; // keep left turns negative, right turns positive
+        const left = input.left;
+        const right = input.right;
+        if (left) steerInput = -1;
+        else if (right) steerInput = 1;
+        else steerInput = 0;
         throttle = input.up ? 1 : 0;
         brake = input.down ? 1 : 0;
       } else if (desiredDir) {
@@ -834,10 +836,11 @@
         const supportGroup = new THREE.Group();
         const pillarMat = new THREE.MeshStandardMaterial({ color: 0x8a8c94, roughness: 0.62, metalness: 0.28 });
         const beamMat = new THREE.MeshStandardMaterial({ color: 0x676a72, roughness: 0.45, metalness: 0.35 });
-        const beamGeo = new THREE.BoxGeometry(TRACK_WIDTH * 1.1, 0.24, 0.7);
+        const beamGeo = new THREE.BoxGeometry(TRACK_WIDTH * 1.8, 0.24, 0.7);
         const pillarGeo = new THREE.CylinderGeometry(0.55, 0.7, 1, 12);
         const spanSteps = [-4, 0, 4];
-        const lateralOffsets = [-this.barrierClearance - 0.6, this.barrierClearance + 0.6];
+        const pillarLateralOffset = this.barrierClearance + 3.5;
+        const lateralOffsets = [-pillarLateralOffset, pillarLateralOffset];
         this.bridges.forEach((bridge) => {
           spanSteps.forEach((step) => {
             const idx = (bridge.index + step + pts.length) % pts.length;
@@ -981,12 +984,12 @@
       lamp.position.y = 4.1;
       lightProto.add(pole, lamp);
 
-      const ringOffset = this.barrierClearance + 7;
+      const ringOffset = this.barrierClearance + 9;
       const sampleStep = Math.max(14, Math.floor(pts.length / 18));
       for (let i = 0; i < pts.length; i += sampleStep) {
         const p = pts[i];
         const n2 = normals2[i];
-        const sideJitter = (i / sampleStep) % 2 === 0 ? 2.4 : -1.6;
+        const sideJitter = (i / sampleStep) % 2 === 0 ? 2.8 : -2.1;
         const offset = ringOffset + sideJitter;
         const leftTree = treeProto.clone();
         leftTree.position.set(p.x + n2.x * offset, 0, p.z + n2.y * offset);
@@ -996,7 +999,7 @@
 
         if (i % (sampleStep * 2) === 0) {
           const tent = tentProto.clone();
-          tent.position.set(p.x + n2.x * (offset + 3.5), 0, p.z + n2.y * (offset + 3.5));
+          tent.position.set(p.x + n2.x * (ringOffset + 5.5), 0, p.z + n2.y * (ringOffset + 5.5));
           envGroup.add(tent);
         }
       }
@@ -1005,7 +1008,7 @@
       for (let i = 0; i < pts.length; i += lightStep) {
         const p = pts[i];
         const n2 = normals2[i];
-        const offset = this.barrierClearance + 3.8;
+        const offset = this.barrierClearance + 5.5;
         const poleLeft = lightProto.clone();
         poleLeft.position.set(p.x + n2.x * offset, 0, p.z + n2.y * offset);
         const poleRight = lightProto.clone();
@@ -1045,6 +1048,10 @@
       this.hud = config.hud || {};
       this.leaderboard = config.leaderboard;
       this.countdownEl = config.countdownEl;
+      this.isAuthenticated = !!config.isAuthenticated;
+      this.bestResult = config.bestResult || null;
+      this.bestResultEls = config.bestResultEls || {};
+      this.resultSubmitted = false;
 
       this.mode = MODE.TIME;
       this.selectedCar = "red";
@@ -1072,6 +1079,7 @@
       this.loadCircuit(this.circuitKey);
       this.resetSession();
       this.resize();
+      this.renderBestResult(this.bestResult);
       window.addEventListener("resize", () => this.resize());
       this.loop();
     }
@@ -1196,6 +1204,7 @@
       this.countdown = 0;
       this.goTimer = 0;
       this.circuitStartTime = 0;
+      this.resultSubmitted = false;
       this.setStatus("Ready");
       this.renderCountdown("", true);
       this.updateHUD();
@@ -1296,6 +1305,7 @@
           this.state = "finished";
           this.setStatus("Finished");
           this.renderCountdown("", true);
+          this.submitBestResult();
         }
         if (this.goTimer > 0) {
           this.goTimer -= dt;
@@ -1374,6 +1384,78 @@
           li.append(swatch, label, time);
           this.leaderboard.appendChild(li);
         });
+      }
+    }
+
+    submitBestResult() {
+      if (this.resultSubmitted) return;
+      this.resultSubmitted = true;
+
+      const player = this.racers[0];
+      const lapValue = Number(player?.stats?.bestLap?.() ?? NaN);
+      const hasLap = Number.isFinite(lapValue);
+
+      const payload = {
+        bestLapTime: hasLap ? lapValue : null,
+        totalTime: this.circuitStartTime,
+        trackKey: this.circuitKey,
+        trackName: TRACKS[this.circuitKey]?.meta?.displayName || this.circuitKey,
+      };
+
+      if (!hasLap || !this.isAuthenticated) {
+        this.renderBestResult(this.bestResult);
+        return;
+      }
+
+      fetch("/F1Game/SaveBestResult", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (!data) return;
+          if (data.bestResult) this.bestResult = data.bestResult;
+          this.renderBestResult(this.bestResult);
+        })
+        .catch(() => {
+          this.renderBestResult(this.bestResult);
+        });
+    }
+
+    renderBestResult(best) {
+      const els = this.bestResultEls || {};
+      const stats = els.stats || els.container?.querySelector?.("#best-result-stats");
+      const message = els.message || els.container?.querySelector?.("#best-result-message");
+      const lap = els.lap || els.container?.querySelector?.("#best-result-lap");
+      const track = els.track || els.container?.querySelector?.("#best-result-track");
+      const updated = els.updated || els.container?.querySelector?.("#best-result-updated");
+      const lapValue = Number(best?.bestLapTime ?? NaN);
+      const hasResult = Number.isFinite(lapValue);
+
+      if (stats) stats.classList.toggle("d-none", !hasResult);
+
+      if (message) {
+        if (!this.isAuthenticated) {
+          message.textContent = "Log in to save your best result.";
+          message.classList.remove("d-none");
+        } else if (!hasResult) {
+          message.textContent = "Complete a race to set your best lap.";
+          message.classList.remove("d-none");
+        } else {
+          message.classList.add("d-none");
+        }
+      }
+
+      if (lap) lap.textContent = hasResult ? `${lapValue.toFixed(3)} s` : "-";
+      if (track) track.textContent = hasResult ? best.trackName || best.trackKey || "Unknown" : "-";
+      if (updated) {
+        if (hasResult && best?.updatedAt) {
+          const dt = new Date(best.updatedAt);
+          updated.textContent = Number.isNaN(dt.getTime()) ? "-" : dt.toLocaleString();
+        } else {
+          updated.textContent = "-";
+        }
       }
     }
 

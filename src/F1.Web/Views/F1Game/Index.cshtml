@@ -1,5 +1,27 @@
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@model F1.Web.Models.F1GameViewModel
 @{
     ViewData["Title"] = "F1 Game";
+    var jsonOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+    var bestResultJson = JsonSerializer.Serialize(Model?.BestResult, jsonOptions);
+    var hasBestResult = Model?.BestResult != null;
+    var bestResultMessage = Model?.IsAuthenticated == true
+        ? (hasBestResult ? string.Empty : "Complete a race to set your best lap.")
+        : "Log in to save your best result.";
+    var bestLapDisplay = Model?.BestResult?.BestLapTime?.ToString("0.000") ?? "-";
+    var bestTrackDisplay = "-";
+    if (Model?.BestResult != null)
+    {
+        bestTrackDisplay = !string.IsNullOrWhiteSpace(Model.BestResult.TrackName)
+            ? Model.BestResult.TrackName!
+            : Model.BestResult.TrackKey ?? "-";
+    }
+    var bestUpdatedDisplay = Model?.BestResult?.UpdatedAt?.ToLocalTime().ToString("g") ?? "-";
 }
 
 <section class="container py-4">
@@ -112,7 +134,32 @@
           </div>
         </div>
       </div>
-      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mt-1">
+    <div class="col-12">
+      <div id="best-result-card" class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Your best result</h5>
+          <div id="best-result-message" class="text-muted @(string.IsNullOrEmpty(bestResultMessage) ? "d-none" : string.Empty)">
+            @bestResultMessage
+          </div>
+          <div id="best-result-stats" class="d-flex flex-column gap-2 @(hasBestResult ? string.Empty : "d-none")">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted small">Best lap</span>
+              <span class="fw-semibold" id="best-result-lap">@bestLapDisplay</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted small">Track</span>
+              <span class="fw-semibold" id="best-result-track">@bestTrackDisplay</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted small">Updated</span>
+              <span class="fw-semibold" id="best-result-updated">@bestUpdatedDisplay</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -219,6 +266,7 @@
   <script src="~/js/f1trackData.js" asp-append-version="true"></script>
   <script src="~/js/f1game3d.js" asp-append-version="true"></script>
   <script>
+    const initialBestResult = @Html.Raw(bestResultJson ?? "null");
     window.f1Game3D = window.F1Game3D.init({
       canvas: document.getElementById("f1game-canvas"),
       modeInputs: document.querySelectorAll('input[name="f1game-mode"]'),
@@ -235,7 +283,17 @@
         best: document.getElementById("hud-best"),
         status: document.getElementById("hud-status")
       },
-      leaderboard: document.getElementById("f1-positions")
+      leaderboard: document.getElementById("f1-positions"),
+      bestResult: initialBestResult,
+      isAuthenticated: @(Model?.IsAuthenticated == true ? "true" : "false"),
+      bestResultEls: {
+        container: document.getElementById("best-result-card"),
+        message: document.getElementById("best-result-message"),
+        stats: document.getElementById("best-result-stats"),
+        lap: document.getElementById("best-result-lap"),
+        track: document.getElementById("best-result-track"),
+        updated: document.getElementById("best-result-updated")
+      }
     });
   </script>
 }

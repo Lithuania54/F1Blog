@@ -23,6 +23,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<UserBadge> UserBadges => Set<UserBadge>();
     public DbSet<RaceRadioBite> RaceRadioBites => Set<RaceRadioBite>();
     public DbSet<TechDrop> TechDrops => Set<TechDrop>();
+    public DbSet<UserBestResult> UserBestResults => Set<UserBestResult>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -150,5 +151,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany(u => u.UserBadges)
             .HasForeignKey(ub => ub.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<UserBestResult>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.BestResults)
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<UserBestResult>()
+            .HasIndex(r => r.UserId)
+            .IsUnique();
     }
 }

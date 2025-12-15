@@ -16,11 +16,7 @@
       <div class="g-card__title mb-1">Next race</div>
       <div class="g-card__muted">@Model.NextRace.Name (@Model.NextRace.Country)</div>
       <div class="g-tag">@Model.NextRace.LocalStartDisplay</div>
-      <div class="g-countdown" data-start="@Model.NextRace.StartTimeUtc.ToUniversalTime().ToString("o")">
-        <span class="g-count g-days">--</span>d
-        <span class="g-count g-hours">--</span>h
-        <span class="g-count g-mins">--</span>m
-      </div>
+      <div class="g-countdown">March 6th</div>
     </div>
   </div>
 
@@ -114,29 +110,3 @@
     </div>
   </div>
 </section>
-
-@section Scripts {
-  <script>
-    (function(){
-      const el = document.querySelector('.g-countdown');
-      if(!el) return;
-      const start = new Date(el.dataset.start);
-      const daysEl = el.querySelector('.g-days');
-      const hoursEl = el.querySelector('.g-hours');
-      const minsEl = el.querySelector('.g-mins');
-      const tick = () => {
-        const now = new Date();
-        let diff = Math.max(0, start - now);
-        const days = Math.floor(diff / (1000*60*60*24));
-        diff -= days*1000*60*60*24;
-        const hours = Math.floor(diff / (1000*60*60));
-        diff -= hours*1000*60*60;
-        const mins = Math.floor(diff / (1000*60));
-        daysEl.textContent = days.toString().padStart(2,'0');
-        hoursEl.textContent = hours.toString().padStart(2,'0');
-        minsEl.textContent = mins.toString().padStart(2,'0');
-      };
-      tick(); setInterval(tick, 60000);
-    })();
-  </script>
-}

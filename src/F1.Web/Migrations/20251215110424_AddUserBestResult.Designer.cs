@@ -3,6 +3,7 @@ using System;
 using F1.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace F1.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251215110424_AddUserBestResult")]
+    partial class AddUserBestResult
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -675,10 +678,15 @@ namespace F1.Web.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("UserId1")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserId")
                         .IsUnique();
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("UserBestResults");
                 });
@@ -990,11 +998,15 @@ namespace F1.Web.Migrations
 
             modelBuilder.Entity("F1.Web.Models.UserBestResult", b =>
                 {
-                    b.HasOne("F1.Web.Models.ApplicationUser", "User")
+                    b.HasOne("F1.Web.Models.ApplicationUser", null)
                         .WithMany("BestResults")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("F1.Web.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1");
 
                     b.Navigation("User");
                 });
